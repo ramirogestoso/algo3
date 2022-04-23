@@ -11,41 +11,35 @@ DenotativeObject subclass: #ElHabitat
 ElHabitat class
 	instanceVariableNames: 'polillas orugas huevosDeOriana huevosDePolly huevosDeLara'!
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 19:49:24'!
+!ElHabitat class methodsFor: 'Reiniciar habitat' stamp: 'rg 4/23/2022 18:50:52'!
+retrocederAlInicioDeLosTiempos
+	huevosDeOriana := 0.
+	huevosDeLara := 0.
+	huevosDePolly := 0.
+	orugas :=0.
+	polillas :=0.! !
+
+
+!ElHabitat class methodsFor: 'Manejo de recursos' stamp: 'rg 4/21/2022 19:49:24'!
 agregarOruga
 	
 	orugas := orugas +1.! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 20:09:40'!
+!ElHabitat class methodsFor: 'Manejo de recursos' stamp: 'rg 4/21/2022 20:09:40'!
 agregarPolilla
 	polillas := polillas +1.! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'bq 4/23/2022 18:15:01'!
-cantidadDeHuevosDeAvispas
-	^ huevosDeOriana + huevosDeLara + huevosDePolly .! !
-
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'bq 4/23/2022 18:18:16'!
-cantidadDeHuevosDeLara
-	^ huevosDeLara .! !
-
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 20:27:07'!
-cantidadDeHuevosDeOriana
-	^huevosDeOriana .! !
-
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 20:28:04'!
-cantidadDeHuevosDePolly
-	^huevosDePolly .! !
-
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 19:51:19'!
+!ElHabitat class methodsFor: 'Manejo de recursos' stamp: 'rg 4/21/2022 19:51:19'!
 cantidadDeOrugas
 	^orugas.! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 20:10:51'!
+!ElHabitat class methodsFor: 'Manejo de recursos' stamp: 'rg 4/21/2022 20:10:51'!
 cantidadDePolillas
 	^polillas .! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:46:08'!
-ponerHuevosDeLara
+
+!ElHabitat class methodsFor: 'Manejo de huevos' stamp: 'rg 4/23/2022 19:04:32'!
+agregarHuevoDeLara
 	(huevosDeOriana = 0 ) ifFalse: [
 		huevosDeOriana := huevosDeOriana - 1 .
 		huevosDeLara := huevosDeLara + 1.
@@ -55,28 +49,36 @@ ponerHuevosDeLara
 		huevosDeLara := huevosDeLara + 1.
 	]]! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:44:10'!
-ponerHuevosDeOriana
+!ElHabitat class methodsFor: 'Manejo de huevos' stamp: 'rg 4/23/2022 19:05:01'!
+agregarHuevoDeOriana
 	( orugas > 0) ifTrue: [
 		orugas := orugas - 1 .
 		huevosDeOriana := huevosDeOriana + 1. ].! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:44:43'!
-ponerHuevosDePolly
+!ElHabitat class methodsFor: 'Manejo de huevos' stamp: 'rg 4/23/2022 19:05:15'!
+agregarHuevoDePolly
 	( polillas > 0) ifTrue: [
 		polillas := polillas - 1 .
 		huevosDePolly := huevosDePolly + 1. ].! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:50:52'!
-retrocederAlInicioDeLosTiempos
-	huevosDeOriana := 0.
-	huevosDeLara := 0.
-	huevosDePolly := 0.
-	orugas :=0.
-	polillas :=0.! !
+!ElHabitat class methodsFor: 'Manejo de huevos' stamp: 'bq 4/23/2022 18:15:01'!
+cantidadDeHuevosDeAvispas
+	^ huevosDeOriana + huevosDeLara + huevosDePolly .! !
+
+!ElHabitat class methodsFor: 'Manejo de huevos' stamp: 'bq 4/23/2022 18:18:16'!
+cantidadDeHuevosDeLara
+	^ huevosDeLara .! !
+
+!ElHabitat class methodsFor: 'Manejo de huevos' stamp: 'rg 4/21/2022 20:27:07'!
+cantidadDeHuevosDeOriana
+	^huevosDeOriana .! !
+
+!ElHabitat class methodsFor: 'Manejo de huevos' stamp: 'rg 4/21/2022 20:28:04'!
+cantidadDeHuevosDePolly
+	^huevosDePolly .! !
 
 
-!ElHabitat class methodsFor: '--** private fileout/in **--' stamp: 'rg 4/23/2022 18:55:54'!
+!ElHabitat class methodsFor: '--** private fileout/in **--' stamp: 'rg 4/23/2022 19:06:43'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -85,24 +87,6 @@ initializeCollaboratorsFromFile
 	huevosDeOriana := 0.
 	huevosDePolly := 0.
 	huevosDeLara := 0.! !
-
-
-!classDefinition: #Lara category: 'AvispasYAbejasParte2'!
-DenotativeObject subclass: #Lara
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'AvispasYAbejasParte2'!
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'Lara class' category: 'AvispasYAbejasParte2'!
-Lara class
-	instanceVariableNames: ''!
-
-!Lara class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:46:44'!
-intentarReproducirse
-	ElHabitat ponerHuevosDeLara .! !
 
 
 !classDefinition: #Oriana category: 'AvispasYAbejasParte2'!
@@ -118,9 +102,27 @@ DenotativeObject subclass: #Oriana
 Oriana class
 	instanceVariableNames: ''!
 
-!Oriana class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:47:00'!
+!Oriana class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 19:05:01'!
 intentarReproducirse
-	ElHabitat ponerHuevosDeOriana .! !
+	ElHabitat agregarHuevoDeOriana .! !
+
+
+!classDefinition: #Lara category: 'AvispasYAbejasParte2'!
+Oriana subclass: #Lara
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'AvispasYAbejasParte2'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Lara class' category: 'AvispasYAbejasParte2'!
+Lara class
+	instanceVariableNames: ''!
+
+!Lara class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 19:04:35'!
+intentarReproducirse
+	ElHabitat agregarHuevoDeLara .! !
 
 
 !classDefinition: #Ornella category: 'AvispasYAbejasParte2'!
@@ -132,7 +134,7 @@ Oriana subclass: #Ornella
 
 
 !classDefinition: #Polly category: 'AvispasYAbejasParte2'!
-DenotativeObject subclass: #Polly
+Oriana subclass: #Polly
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -144,9 +146,9 @@ DenotativeObject subclass: #Polly
 Polly class
 	instanceVariableNames: ''!
 
-!Polly class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:48:41'!
+!Polly class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 19:05:15'!
 intentarReproducirse
-	ElHabitat ponerHuevosDePolly .! !
+	ElHabitat agregarHuevoDePolly .! !
 
 
 !classDefinition: #PruebasReproduccionDeAvispas category: 'AvispasYAbejasParte2'!
