@@ -9,19 +9,7 @@ DenotativeObject subclass: #ElHabitat
 
 !classDefinition: 'ElHabitat class' category: 'AvispasYAbejasParte2'!
 ElHabitat class
-	instanceVariableNames: 'huevosDeOriana huevosDeLara huevosDePolly orugas polillas'!
-
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'bq 4/23/2022 18:17:02'!
-agregarHuevoDeLara
-	huevosDeLara := huevosDeLara+1 .! !
-
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 20:21:23'!
-agregarHuevoDeOriana
-	huevosDeOriana := huevosDeOriana + 1.! !
-
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 20:21:57'!
-agregarHuevoDePolly
-	huevosDePolly := huevosDePolly + 1.! !
+	instanceVariableNames: 'polillas orugas huevosDeOriana huevosDePolly huevosDeLara'!
 
 !ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 19:49:24'!
 agregarOruga
@@ -44,17 +32,9 @@ cantidadDeHuevosDeLara
 cantidadDeHuevosDeOriana
 	^huevosDeOriana .! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 20:27:37'!
-cantidadDeHuevosDeOrnella
-	^huevosDeOrnella .! !
-
 !ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 20:28:04'!
 cantidadDeHuevosDePolly
 	^huevosDePolly .! !
-
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'bq 4/23/2022 18:21:54'!
-cantidadDeHuevosQueNoSonDeLara
-	^ huevosDeOriana + huevosDePolly .! !
 
 !ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 19:51:19'!
 cantidadDeOrugas
@@ -64,23 +44,30 @@ cantidadDeOrugas
 cantidadDePolillas
 	^polillas .! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 19:53:24'!
-matarOruga
-	orugas := orugas-1.! !
+!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:46:08'!
+ponerHuevosDeLara
+	(huevosDeOriana = 0 ) ifFalse: [
+		huevosDeOriana := huevosDeOriana - 1 .
+		huevosDeLara := huevosDeLara + 1.
+	] ifTrue: [ 
+		( huevosDePolly = 0 ) ifFalse: [
+		huevosDePolly := huevosDePolly - 1 .
+		huevosDeLara := huevosDeLara + 1.
+	]]! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 20:11:53'!
-matarPolilla
-	polillas := polillas-1.! !
+!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:44:10'!
+ponerHuevosDeOriana
+	( orugas > 0) ifTrue: [
+		orugas := orugas - 1 .
+		huevosDeOriana := huevosDeOriana + 1. ].! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'bq 4/23/2022 18:23:32'!
-quitarHuevoDeOriana
-	huevosDeOriana := huevosDeOriana - 1.! !
+!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:44:43'!
+ponerHuevosDePolly
+	( polillas > 0) ifTrue: [
+		polillas := polillas - 1 .
+		huevosDePolly := huevosDePolly + 1. ].! !
 
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'bq 4/23/2022 18:23:42'!
-quitarHuevoDePolly
-	huevosDePolly := huevosDePolly - 1.! !
-
-!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'bq 4/23/2022 18:15:16'!
+!ElHabitat class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:50:52'!
 retrocederAlInicioDeLosTiempos
 	huevosDeOriana := 0.
 	huevosDeLara := 0.
@@ -89,15 +76,15 @@ retrocederAlInicioDeLosTiempos
 	polillas :=0.! !
 
 
-!ElHabitat class methodsFor: '--** private fileout/in **--' stamp: 'bq 4/23/2022 18:26:06'!
+!ElHabitat class methodsFor: '--** private fileout/in **--' stamp: 'rg 4/23/2022 18:55:54'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
-	huevosDeOriana := 0.
-	huevosDeLara := 0.
-	huevosDePolly := 0.
+	polillas := 0.
 	orugas := 0.
-	polillas := 0.! !
+	huevosDeOriana := 0.
+	huevosDePolly := 0.
+	huevosDeLara := 0.! !
 
 
 !classDefinition: #Lara category: 'AvispasYAbejasParte2'!
@@ -113,16 +100,9 @@ DenotativeObject subclass: #Lara
 Lara class
 	instanceVariableNames: ''!
 
-!Lara class methodsFor: 'as yet unclassified' stamp: 'bq 4/23/2022 18:25:15'!
+!Lara class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:46:44'!
 intentarReproducirse
-	( ElHabitat cantidadDeHuevosDeOriana = 0 ) ifFalse: [
-		ElHabitat quitarHuevoDeOriana .
-		ElHabitat agregarHuevoDeLara.
-	] ifTrue:
-	[( ElHabitat cantidadDeHuevosDePolly = 0 ) ifFalse: [
-		ElHabitat quitarHuevoDePolly .
-		ElHabitat agregarHuevoDeLara.
-	]]! !
+	ElHabitat ponerHuevosDeLara .! !
 
 
 !classDefinition: #Oriana category: 'AvispasYAbejasParte2'!
@@ -138,12 +118,9 @@ DenotativeObject subclass: #Oriana
 Oriana class
 	instanceVariableNames: ''!
 
-!Oriana class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 20:17:40'!
+!Oriana class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:47:00'!
 intentarReproducirse
-	( ElHabitat cantidadDeOrugas = 0 ) ifFalse: [
-		ElHabitat matarOruga.
-		ElHabitat agregarHuevoDeOriana.
-	]! !
+	ElHabitat ponerHuevosDeOriana .! !
 
 
 !classDefinition: #Ornella category: 'AvispasYAbejasParte2'!
@@ -167,12 +144,9 @@ DenotativeObject subclass: #Polly
 Polly class
 	instanceVariableNames: ''!
 
-!Polly class methodsFor: 'as yet unclassified' stamp: 'rg 4/21/2022 20:19:31'!
+!Polly class methodsFor: 'as yet unclassified' stamp: 'rg 4/23/2022 18:48:41'!
 intentarReproducirse
-	( ElHabitat cantidadDePolillas = 0 ) ifFalse: [
-		ElHabitat matarPolilla.
-		ElHabitat agregarHuevoDePolly.
-	]! !
+	ElHabitat ponerHuevosDePolly .! !
 
 
 !classDefinition: #PruebasReproduccionDeAvispas category: 'AvispasYAbejasParte2'!
@@ -415,7 +389,7 @@ laAvispaLara
 laAvispaOriana
 	^Oriana.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'bq 4/23/2022 18:12:53'!
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'rg 4/23/2022 18:48:18'!
 laAvispaOrnella
 	^Ornella .! !
 
