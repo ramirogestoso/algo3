@@ -37,17 +37,17 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'bq 5/1/2022 18:09:41'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'bq 5/1/2022 18:30:48'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
 	| customerBook aBlock| 
 	customerBook := CustomerBook new.
 	aBlock := [customerBook addCustomerNamed: 'John Lennon'.].
-	self assert: (customerBook timeToExecute: aBlock isLessThan: (50 * millisecond))
+	self assert: (Chronometer timeToExecute: aBlock isLessThan: (50 * millisecond))
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'bq 5/1/2022 18:09:50'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'bq 5/1/2022 18:30:57'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
 	| customerBook paulMcCartney aBlock|
@@ -56,7 +56,7 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	paulMcCartney := 'Paul McCartney'.
 	aBlock := [customerBook removeCustomerNamed: paulMcCartney].
 	customerBook addCustomerNamed: paulMcCartney.
-	self assert: ( customerBook timeToExecute: aBlock isLessThan:(100 * millisecond ))
+	self assert: (Chronometer timeToExecute: aBlock isLessThan:(100 * millisecond ))
 	
 ! !
 
@@ -157,6 +157,31 @@ test08CanNotSuspendAnAlreadySuspendedCustomer
 ! !
 
 
+!classDefinition: #Chronometer category: 'CodigoRepetido-Ejercicio'!
+Object subclass: #Chronometer
+	instanceVariableNames: 'suspended active'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'CodigoRepetido-Ejercicio'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Chronometer class' category: 'CodigoRepetido-Ejercicio'!
+Chronometer class
+	instanceVariableNames: ''!
+
+!Chronometer class methodsFor: 'as yet unclassified' stamp: 'bq 5/1/2022 18:31:26'!
+timeToExecute: aBlock isLessThan: anAmmountOfTime
+
+	| millisecondsAfter millisecondsBefore 	|
+	
+	millisecondsBefore := Time millisecondClockValue * millisecond.
+	aBlock value.
+	millisecondsAfter := Time millisecondClockValue * millisecond.
+	
+	^(millisecondsAfter-millisecondsBefore) < anAmmountOfTime .! !
+
+
 !classDefinition: #CustomerBook category: 'CodigoRepetido-Ejercicio'!
 Object subclass: #CustomerBook
 	instanceVariableNames: 'suspended active'
@@ -231,15 +256,3 @@ suspendCustomerNamed: aName
 	
 	suspended add: aName
 ! !
-
-
-!CustomerBook methodsFor: 'NuestrosMetodos' stamp: 'bq 5/1/2022 17:33:54'!
-timeToExecute: aBlock isLessThan: anAmmountOfTime
-
-	| millisecondsAfter millisecondsBefore 	|
-	
-	millisecondsBefore := Time millisecondClockValue * millisecond.
-	aBlock value.
-	millisecondsAfter := Time millisecondClockValue * millisecond.
-	
-	^(millisecondsAfter-millisecondsBefore) < anAmmountOfTime .! !
