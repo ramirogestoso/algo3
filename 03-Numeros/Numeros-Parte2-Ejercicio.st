@@ -266,7 +266,7 @@ test42SignIsCorrectlyAssignedToFractionWithNegativeDivisor
 	self assert: oneHalf negated equals: (one / negativeTwo)! !
 
 
-!NumeroTest methodsFor: 'setup' stamp: 'NR 9/23/2018 23:46:28'!
+!NumeroTest methodsFor: 'setup' stamp: 'rg 5/8/2022 19:26:29'!
 setUp
 
 	zero := Entero with: 0.
@@ -420,17 +420,12 @@ Numero subclass: #Entero
 / aDivisor 
 		^aDivisor divideAnEntero: self ! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HAW 9/24/2018 08:47:50'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'rg 5/8/2022 20:52:18'!
 fibonacci
 
 	| one two |
-	
 	one := Entero with: 1.
 	two := Entero with: 2.
-	
-	self isNegative ifTrue: [self error: Entero negativeFibonacciErrorDescription ].	
-	(self isZero or: [self isOne]) ifTrue: [^one].
-	
 	^ (self - one) fibonacci + (self - two) fibonacci
 		! !
 
@@ -466,20 +461,22 @@ printOn: aStream
 	aStream print: value ! !
 
 
-!Entero methodsFor: 'testing' stamp: 'NR 9/23/2018 22:17:55'!
+!Entero methodsFor: 'testing' stamp: 'rg 5/8/2022 20:56:48'!
 isNegative
-	
-	^value < 0! !
+	self subclassResponsibility ! !
 
-!Entero methodsFor: 'testing' stamp: 'HernanWilkinson 5/7/2016 20:14'!
+!Entero methodsFor: 'testing' stamp: 'rg 5/8/2022 20:58:09'!
 isOne
-	
-	^value = 1! !
+	self subclassResponsibility ! !
 
-!Entero methodsFor: 'testing' stamp: 'HernanWilkinson 5/7/2016 20:12'!
+!Entero methodsFor: 'testing' stamp: 'rg 5/8/2022 20:57:58'!
 isZero
-	
-	^value = 0! !
+	self subclassResponsibility ! !
+
+
+!Entero methodsFor: 'converting' stamp: 'rg 5/8/2022 20:51:57'!
+returnNumeratorIfOneNumeratorIfNot: aFraccion
+	^aFraccion! !
 
 
 !Entero methodsFor: 'arithmetic operations - private' stamp: 'HernanWilkinson 5/7/2016 21:55'!
@@ -545,13 +542,144 @@ Entero class
 negativeFibonacciErrorDescription
 	^ ' Fibonacci no está definido aquí para Enteros Negativos'! !
 
-!Entero class methodsFor: 'instance creation' stamp: 'JS 5/5/2022 03:55:37'!
+!Entero class methodsFor: 'instance creation' stamp: 'rg 5/8/2022 20:55:55'!
 with: aValue 
 	
 	"Esta verificacion esta puesta por si se equivocan y quieren crear un Entero pasando otra cosa que un Integer - Hernan"
 	aValue isInteger ifFalse: [  self error: 'aValue debe ser anInteger' ].
+	aValue = 0 ifTrue: [^Cero new initializeWith: aValue].
+	aValue = 1 ifTrue: [^Uno new initializeWith: aValue].
+	aValue < 0 ifTrue: [^Negativo new initializeWith: aValue].
 	
-	^self new initializeWith: aValue! !
+	^Positivo new initializeWith: aValue! !
+
+
+!classDefinition: #Cero category: 'Numeros-Parte2-Ejercicio'!
+Entero subclass: #Cero
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+!Cero methodsFor: 'testing' stamp: 'rg 5/8/2022 20:57:19'!
+isNegative
+	
+	^false! !
+
+!Cero methodsFor: 'testing' stamp: 'rg 5/8/2022 20:58:16'!
+isOne
+	
+	^false! !
+
+!Cero methodsFor: 'testing' stamp: 'rg 5/8/2022 20:57:30'!
+isZero
+	
+	^true! !
+
+
+!Cero methodsFor: 'arithmetic operations' stamp: 'rg 5/8/2022 20:29:04'!
+/ aDivisor
+	^ self! !
+
+!Cero methodsFor: 'arithmetic operations' stamp: 'rg 5/8/2022 19:44:09'!
+fibonacci
+	^Entero with: 1! !
+
+
+!Cero methodsFor: 'arithmetic operations - private' stamp: 'rg 5/8/2022 19:49:37'!
+divideAFraccion: unaFraccion
+
+	self error: self class canNotDivideByZeroErrorDescription! !
+
+!Cero methodsFor: 'arithmetic operations - private' stamp: 'rg 5/8/2022 19:51:09'!
+divideAnEntero: unaFraccion
+
+	self error: self class canNotDivideByZeroErrorDescription! !
+
+
+!classDefinition: #Negativo category: 'Numeros-Parte2-Ejercicio'!
+Entero subclass: #Negativo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+!Negativo methodsFor: 'testing' stamp: 'rg 5/8/2022 20:57:10'!
+isNegative
+	
+	^true! !
+
+!Negativo methodsFor: 'testing' stamp: 'rg 5/8/2022 20:58:21'!
+isOne
+	
+	^false! !
+
+!Negativo methodsFor: 'testing' stamp: 'rg 5/8/2022 20:57:40'!
+isZero
+	
+	^false! !
+
+
+!Negativo methodsFor: 'arithmetic operations' stamp: 'rg 5/8/2022 19:56:17'!
+fibonacci
+	self error: self class negativeFibonacciErrorDescription! !
+
+
+!Negativo methodsFor: 'arithmetic operations - private' stamp: 'rg 5/8/2022 20:31:31'!
+divideAFraccion: unaFraccion
+
+	^(unaFraccion negated) / (self negated)! !
+
+!Negativo methodsFor: 'arithmetic operations - private' stamp: 'rg 5/8/2022 20:32:43'!
+divideAnEntero: anEntero
+
+	^(anEntero negated) / (self negated)! !
+
+
+!classDefinition: #Positivo category: 'Numeros-Parte2-Ejercicio'!
+Entero subclass: #Positivo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+!Positivo methodsFor: 'testing' stamp: 'rg 5/8/2022 20:57:01'!
+isNegative
+	
+	^ false! !
+
+!Positivo methodsFor: 'testing' stamp: 'rg 5/8/2022 20:58:29'!
+isOne
+	
+	^false! !
+
+!Positivo methodsFor: 'testing' stamp: 'rg 5/8/2022 20:57:44'!
+isZero
+	
+	^false! !
+
+
+!classDefinition: #Uno category: 'Numeros-Parte2-Ejercicio'!
+Positivo subclass: #Uno
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numeros-Parte2-Ejercicio'!
+
+!Uno methodsFor: 'testing' stamp: 'rg 5/8/2022 20:58:34'!
+isOne
+	
+	^true! !
+
+
+!Uno methodsFor: 'arithmetic operations' stamp: 'rg 5/8/2022 19:43:57'!
+fibonacci
+	^self! !
+
+
+!Uno methodsFor: 'converting' stamp: 'rg 5/8/2022 20:51:57'!
+returnNumeratorIfOneNumeratorIfNot: aFraccion
+	^aFraccion numerator! !
 
 
 !classDefinition: #Fraccion category: 'Numeros-Parte2-Ejercicio'!
@@ -655,12 +783,12 @@ numerator
 	^ numerator! !
 
 
-!Fraccion methodsFor: 'initialization' stamp: 'HernanWilkinson 5/7/2016 22:54'!
+!Fraccion methodsFor: 'initialization' stamp: 'rg 5/8/2022 20:27:08'!
 initializeWith: aNumerator over: aDenominator
 
 	"Estas precondiciones estan por si se comenten errores en la implementacion - Hernan"
-	aNumerator isZero ifTrue: [ self error: 'una fraccion no puede ser cero' ].
-	aDenominator isOne ifTrue: [ self error: 'una fraccion no puede tener denominador 1 porque sino es un entero' ].
+	"aNumerator isZero ifTrue: [ self error: 'una fraccion no puede ser cero' ]."
+	"aDenominator isOne ifTrue: [ self error: 'una fraccion no puede tener denominador 1 porque sino es un entero' ]."
 	
 	numerator := aNumerator.
 	denominator := aDenominator ! !
@@ -696,21 +824,14 @@ printOn: aStream
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'NR 9/23/2018 23:45:19'!
+!Fraccion class methodsFor: 'intance creation' stamp: 'rg 5/8/2022 20:54:46'!
 with: aDividend over: aDivisor
 
 	| greatestCommonDivisor numerator denominator |
-	
-	aDivisor isZero ifTrue: [ self error: self canNotDivideByZeroErrorDescription ].
-	aDividend isZero ifTrue: [ ^aDividend ].
-	
-	aDivisor isNegative ifTrue:[ ^aDividend negated / aDivisor negated].
 	
 	greatestCommonDivisor := aDividend greatestCommonDivisorWith: aDivisor. 
 	numerator := aDividend // greatestCommonDivisor.
 	denominator := aDivisor // greatestCommonDivisor.
 	
-	denominator isOne ifTrue: [ ^numerator ].
-
-	^self new initializeWith: numerator over: denominator
+	^denominator returnNumeratorIfOneNumeratorIfNot: (self new initializeWith: numerator over: denominator)
 	! !
