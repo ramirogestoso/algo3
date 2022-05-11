@@ -1,4 +1,4 @@
-!classDefinition: #OOStackTest category: #'Stack-Exercise'!
+!classDefinition: #OOStackTest category: 'Stack-Exercise'!
 TestCase subclass: #OOStackTest
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -137,7 +137,7 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 ! !
 
 
-!classDefinition: #SentenceFinderByPrefixTest category: #'Stack-Exercise'!
+!classDefinition: #SentenceFinderByPrefixTest category: 'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -145,16 +145,50 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	category: 'Stack-Exercise'!
 
 
-!classDefinition: #OOStack category: #'Stack-Exercise'!
+!classDefinition: #OOStack category: 'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: ''
+	instanceVariableNames: 'stack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!OOStack methodsFor: 'initialization' stamp: 'bq 5/11/2022 15:22:11'!
+initialize
+	stack := OrderedCollection new.! !
+
+
+!OOStack methodsFor: 'accessing' stamp: 'bq 5/11/2022 15:24:12'!
+size
+	^stack size .
+	! !
+
+!OOStack methodsFor: 'accessing' stamp: 'bq 5/11/2022 15:27:48'!
+top
+	
+	
+	self size>0 ifTrue: [^stack first .].
+	self error: OOStack stackEmptyErrorDescription .! !
+
+
+!OOStack methodsFor: 'testing' stamp: 'bq 5/11/2022 15:17:31'!
+isEmpty
+	^stack isEmpty .! !
+
+
+!OOStack methodsFor: 'removing' stamp: 'bq 5/11/2022 15:26:58'!
+pop
+	self size>0 ifTrue: [^stack removeFirst .].
+	self error: OOStack stackEmptyErrorDescription .
+	! !
+
+
+!OOStack methodsFor: 'adding' stamp: 'bq 5/11/2022 15:18:24'!
+push: anElement
+	stack addFirst: anElement .! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'OOStack class' category: #'Stack-Exercise'!
+!classDefinition: 'OOStack class' category: 'Stack-Exercise'!
 OOStack class
 	instanceVariableNames: ''!
 
@@ -164,7 +198,7 @@ stackEmptyErrorDescription
 	^ 'Stack is empty'! !
 
 
-!classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
+!classDefinition: #SentenceFinderByPrefix category: 'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
 	instanceVariableNames: ''
 	classVariableNames: ''
