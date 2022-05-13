@@ -144,6 +144,70 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'rg 5/12/2022 21:07:13'!
+test01SentenceFinderByPrefixEmptyReturnsEmptyCollectionOfSentences
+	| sentenceFinder |
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	
+	self assert: (sentenceFinder find: 'aPrefix') isEmpty ! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'rg 5/12/2022 21:07:06'!
+test02SentenceFinderByPrefixWithOneSentenceFindsItAndItsOk
+	| sentenceFinder aSentence |
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	aSentence := 'aPrefix sentence' .
+	sentenceFinder add: aSentence .
+	
+	self assert: (sentenceFinder find: 'aPrefix') includes: aSentence ! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'rg 5/12/2022 21:06:59'!
+test03SentenceFinderByPrefixWithOneSentenceNotFindsItButItsOk
+	| sentenceFinder aSentence |
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	aSentence := 'aSufix sentence' .
+	sentenceFinder add: aSentence .
+	
+	self assert: ((sentenceFinder find: 'aPrefix') includes: aSentence) not! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'rg 5/12/2022 21:06:47'!
+test04SentenceFinderByPrefixWithManySentencesFindsOnlyOneAndItsOk
+	| sentenceFinder |
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	sentenceFinder add: 'one sentence' .
+	sentenceFinder add: 'two sentences' .
+	sentenceFinder add: 'three senteces ' .
+	self assert: (sentenceFinder find: 'two') includes: 'two sentences' . ! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'rg 5/12/2022 21:06:39'!
+test05SentenceFinderByPrefixWithManySentencesFindsManyAndItsOk
+	| sentenceFinder sentencesFound |
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	sentenceFinder add: 'one sentence' .
+	sentenceFinder add: 'two sentences' .
+	sentenceFinder add: 'two send' .
+	sentenceFinder add: 'two added' .
+	
+	sentencesFound := sentenceFinder find: 'two' .
+	#('two sentences' 'two send' 'two added') do: [ :aSentence | self assert: sentencesFound includes: aSentence ] .! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'rg 5/12/2022 21:06:19'!
+test06SentenceFinderByPrefixWithManySentencesDoesNotFindsAnyAndItsOk
+	| sentenceFinder sentencesFound |
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	sentenceFinder add: 'one sentence' .
+	sentenceFinder add: 'two sentences' .
+	sentenceFinder add: 'two send' .
+	sentenceFinder add: 'two added' .
+	
+	sentencesFound := sentenceFinder find: 'sent' .
+	self assert: sentencesFound isEmpty! !
+
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
 Object subclass: #OOStack
@@ -152,39 +216,38 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'initialization' stamp: 'bq 5/11/2022 15:22:11'!
+!OOStack methodsFor: 'initialization' stamp: 'rg 5/12/2022 20:03:11'!
 initialize
-	stack := OrderedCollection new.! !
+	stack := OrderedCollection new.
+	stack addFirst: OOStackElement newAsBaseOfStack .! !
 
 
-!OOStack methodsFor: 'accessing' stamp: 'bq 5/11/2022 15:24:12'!
+!OOStack methodsFor: 'accessing' stamp: 'rg 5/12/2022 00:22:57'!
 size
-	^stack size .
+	^stack size - 1 .
 	! !
 
-!OOStack methodsFor: 'accessing' stamp: 'bq 5/11/2022 15:27:48'!
+!OOStack methodsFor: 'accessing' stamp: 'rg 5/12/2022 00:26:30'!
 top
-	
-	
-	self size>0 ifTrue: [^stack first .].
-	self error: OOStack stackEmptyErrorDescription .! !
+	 ^stack first elementValue! !
 
 
-!OOStack methodsFor: 'testing' stamp: 'bq 5/11/2022 15:17:31'!
+!OOStack methodsFor: 'testing' stamp: 'rg 5/12/2022 19:54:43'!
 isEmpty
-	^stack isEmpty .! !
+	^stack first isBaseOfStack .! !
 
 
-!OOStack methodsFor: 'removing' stamp: 'bq 5/11/2022 15:26:58'!
-pop
-	self size>0 ifTrue: [^stack removeFirst .].
-	self error: OOStack stackEmptyErrorDescription .
+!OOStack methodsFor: 'removing' stamp: 'rg 5/12/2022 20:04:36'!
+pop	| topElement |
+	topElement := self top . "si el primero el elemento base del stack, lanza error aca"
+	stack removeFirst .
+	^topElement
 	! !
 
 
-!OOStack methodsFor: 'adding' stamp: 'bq 5/11/2022 15:18:24'!
+!OOStack methodsFor: 'adding' stamp: 'rg 5/12/2022 20:06:02'!
 push: anElement
-	stack addFirst: anElement .! !
+	stack addFirst: (OOStackElement newWithValue: anElement) .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -198,9 +261,123 @@ stackEmptyErrorDescription
 	^ 'Stack is empty'! !
 
 
-!classDefinition: #SentenceFinderByPrefix category: 'Stack-Exercise'!
-Object subclass: #SentenceFinderByPrefix
+!classDefinition: #OOStackElement category: 'Stack-Exercise'!
+Object subclass: #OOStackElement
+	instanceVariableNames: 'element'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStackElement methodsFor: 'testing' stamp: 'rg 5/12/2022 19:53:12'!
+isBaseOfStack
+	self subclassResponsibility ! !
+
+
+!OOStackElement methodsFor: 'accessing' stamp: 'rg 5/12/2022 00:29:14'!
+elementValue
+	self subclassResponsibility ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'OOStackElement class' category: 'Stack-Exercise'!
+OOStackElement class
+	instanceVariableNames: ''!
+
+!OOStackElement class methodsFor: 'instance creation' stamp: 'rg 5/12/2022 20:03:08'!
+newAsBaseOfStack
+	^OOStackBaseElement new! !
+
+!OOStackElement class methodsFor: 'instance creation' stamp: 'rg 5/12/2022 20:06:49'!
+newWithValue: anObject
+	^OOStackNotBaseElement new initializeWithValue: anObject ! !
+
+
+!classDefinition: #OOStackBaseElement category: 'Stack-Exercise'!
+OOStackElement subclass: #OOStackBaseElement
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!OOStackBaseElement methodsFor: 'testing' stamp: 'rg 5/12/2022 19:53:15'!
+isBaseOfStack
+	^true! !
+
+
+!OOStackBaseElement methodsFor: 'accessing' stamp: 'rg 5/12/2022 20:00:44'!
+elementValue
+	self error: OOStack stackEmptyErrorDescription ! !
+
+
+!classDefinition: #OOStackNotBaseElement category: 'Stack-Exercise'!
+OOStackElement subclass: #OOStackNotBaseElement
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStackNotBaseElement methodsFor: 'initialization' stamp: 'rg 5/12/2022 20:06:46'!
+initializeWithValue: anObject 
+	element := anObject.! !
+
+
+!OOStackNotBaseElement methodsFor: 'accessing' stamp: 'rg 5/12/2022 00:41:13'!
+elementValue
+	^element ! !
+
+
+!OOStackNotBaseElement methodsFor: 'testing' stamp: 'rg 5/12/2022 19:53:15'!
+isBaseOfStack
+	^false ! !
+
+
+!classDefinition: #SentenceFinderByPrefix category: 'Stack-Exercise'!
+Object subclass: #SentenceFinderByPrefix
+	instanceVariableNames: 'stack'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'rg 5/12/2022 21:21:57'!
+find: aPrefix 
+	| sentencesConditionToSatisfy |
+	sentencesConditionToSatisfy := [ :aSentence | aSentence beginsWith: aPrefix ] .
+	^self select: sentencesConditionToSatisfy ! !
+
+!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'rg 5/12/2022 21:28:19'!
+find: aPrefix inStack: aStack
+	| sentencesConditionToSatisfy |
+	sentencesConditionToSatisfy := [ :aSentence | aSentence beginsWith: aPrefix ] .
+	^self select: sentencesConditionToSatisfy ! !
+
+
+!SentenceFinderByPrefix methodsFor: 'adding' stamp: 'rg 5/12/2022 20:24:32'!
+add: aSentence
+	stack push: aSentence! !
+
+
+!SentenceFinderByPrefix methodsFor: 'initialization' stamp: 'rg 5/12/2022 20:25:35'!
+initialize
+	stack := OOStack new ! !
+
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'rg 5/12/2022 21:29:22'!
+stackAsCollection
+	^self stackAsCollection: stack! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'rg 5/12/2022 21:29:00'!
+stackAsCollection: aStack
+	| stackAsCollection |
+	stackAsCollection := OrderedCollection new .
+	aStack size timesRepeat: [ stackAsCollection add: aStack pop ] .
+	stackAsCollection do: [ :anElement | aStack push: anElement ] .
+	^stackAsCollection ! !
+
+
+!SentenceFinderByPrefix methodsFor: 'private - enumerating' stamp: 'rg 5/12/2022 21:30:54'!
+select: aBlockToSatisfy
+	^self select: aBlockToSatisfy inStack: stack! !
+
+!SentenceFinderByPrefix methodsFor: 'private - enumerating' stamp: 'rg 5/12/2022 21:30:20'!
+select: aBlockToSatisfy inStack: aStack
+	^(self stackAsCollection: aStack) select: aBlockToSatisfy ! !
