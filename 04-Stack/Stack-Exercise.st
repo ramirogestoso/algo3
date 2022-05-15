@@ -208,6 +208,81 @@ test06SentenceFinderByPrefixWithManySentencesDoesNotFindsAnyAndItsOk
 	sentencesFound := sentenceFinder find: 'sent' .
 	self assert: sentencesFound isEmpty! !
 
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'bq 5/15/2022 16:32:25'!
+test07SentenceFinderByPrefixWithNilRaisesError
+	| sentenceFinder |
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	sentenceFinder add: 'one sentence' .
+	sentenceFinder add: 'two sentences' .
+	sentenceFinder add: 'two send' .
+	sentenceFinder add: 'two added' .
+	
+	
+	self should: [sentenceFinder find: nil] raise: Error
+	withExceptionDo:  [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ]
+! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'bq 5/15/2022 16:33:10'!
+test08SentenceFinderByPrefixWithEmptyStringRaisesError
+	| sentenceFinder |
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	sentenceFinder add: 'one sentence' .
+	sentenceFinder add: 'two sentences' .
+	sentenceFinder add: 'two send' .
+	sentenceFinder add: 'two added' .
+	
+	
+	self should: [sentenceFinder find: ''] raise: Error
+	withExceptionDo:  [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ]
+! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'bq 5/15/2022 16:36:09'!
+test09SentenceFinderByPrefixWithSpaceRaisesError
+	| sentenceFinder |
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	sentenceFinder add: 'one sentence' .
+	sentenceFinder add: 'two sentences' .
+	sentenceFinder add: 'two send' .
+	sentenceFinder add: 'two added' .
+	
+	
+	self should: [sentenceFinder find: ' '] raise: Error
+	withExceptionDo:  [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ]
+! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'bq 5/15/2022 16:39:13'!
+test10SentenceFinderByPrefixWithSpacesRaisesError
+	| sentenceFinder |
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	sentenceFinder add: 'one sentence' .
+	sentenceFinder add: 'two sentences' .
+	sentenceFinder add: 'two send' .
+	sentenceFinder add: 'two added' .
+	
+	
+	self should: [sentenceFinder find: '    '] raise: Error
+	withExceptionDo:  [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix invalidPrefixErrorMessage ]
+! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'bq 5/15/2022 16:56:17'!
+test11SentenceFinderByPrefixWithNilAsStackRaisesError
+	| sentenceFinder |
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	
+	self should: [sentenceFinder find: 'aPrefix' inStack: nil] raise: Error - MessageNotUnderstood 
+	withExceptionDo:  [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix invalidStackErrorMessage ]
+! !
+
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
 Object subclass: #OOStack
@@ -338,17 +413,21 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'rg 5/12/2022 21:21:57'!
+!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'bq 5/15/2022 16:28:16'!
 find: aPrefix 
-	| sentencesConditionToSatisfy |
+	"| sentencesConditionToSatisfy |
 	sentencesConditionToSatisfy := [ :aSentence | aSentence beginsWith: aPrefix ] .
-	^self select: sentencesConditionToSatisfy ! !
+	^self select: sentencesConditionToSatisfy "
+	^self find: aPrefix inStack: stack.! !
 
-!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'rg 5/12/2022 21:28:19'!
+!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'bq 5/15/2022 16:55:58'!
 find: aPrefix inStack: aStack
 	| sentencesConditionToSatisfy |
+	(aPrefix isKindOf: String) ifFalse: [self error: self class invalidPrefixErrorMessage.].
+	(aPrefix = '' or: (aPrefix beginsWith: ' ')) ifTrue: [self error: self class invalidPrefixErrorMessage.].
+	(aStack isKindOf: OOStack ) ifFalse: [self error: self class invalidStackErrorMessage .].
 	sentencesConditionToSatisfy := [ :aSentence | aSentence beginsWith: aPrefix ] .
-	^self select: sentencesConditionToSatisfy ! !
+	^self select: sentencesConditionToSatisfy inStack: aStack! !
 
 
 !SentenceFinderByPrefix methodsFor: 'adding' stamp: 'rg 5/12/2022 20:24:32'!
@@ -365,19 +444,29 @@ initialize
 stackAsCollection
 	^self stackAsCollection: stack! !
 
-!SentenceFinderByPrefix methodsFor: 'private' stamp: 'rg 5/12/2022 21:29:00'!
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'bq 5/15/2022 16:07:54'!
 stackAsCollection: aStack
 	| stackAsCollection |
 	stackAsCollection := OrderedCollection new .
 	aStack size timesRepeat: [ stackAsCollection add: aStack pop ] .
-	stackAsCollection do: [ :anElement | aStack push: anElement ] .
+	stackAsCollection reversed do: [ :anElement | aStack push: anElement ] .
 	^stackAsCollection ! !
 
 
-!SentenceFinderByPrefix methodsFor: 'private - enumerating' stamp: 'rg 5/12/2022 21:30:54'!
-select: aBlockToSatisfy
-	^self select: aBlockToSatisfy inStack: stack! !
-
-!SentenceFinderByPrefix methodsFor: 'private - enumerating' stamp: 'rg 5/12/2022 21:30:20'!
+!SentenceFinderByPrefix methodsFor: 'private - enumerating' stamp: 'bq 5/15/2022 16:51:50'!
 select: aBlockToSatisfy inStack: aStack
 	^(self stackAsCollection: aStack) select: aBlockToSatisfy ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SentenceFinderByPrefix class' category: 'Stack-Exercise'!
+SentenceFinderByPrefix class
+	instanceVariableNames: ''!
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 16:30:54'!
+invalidPrefixErrorMessage
+	^'El prefijo es invalido'! !
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 16:56:48'!
+invalidStackErrorMessage
+	^'El stack no es valido'! !
