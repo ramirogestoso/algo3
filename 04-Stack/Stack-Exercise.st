@@ -283,6 +283,23 @@ test11SentenceFinderByPrefixWithNilAsStackRaisesError
 			self assert: anError messageText = SentenceFinderByPrefix invalidStackErrorMessage ]
 ! !
 
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'bq 5/15/2022 17:06:49'!
+test12SentenceFinderIsCaseSensitive
+	| sentenceFinder sentencesFound|
+	
+	sentenceFinder := SentenceFinderByPrefix new .
+	sentenceFinder add: 'One Sentence' .
+	sentenceFinder add: 'oNe sentence' .
+	sentenceFinder add: 'onE sentence' .
+	sentenceFinder add: 'one sentence' .
+	
+	
+	sentencesFound := sentenceFinder find: 'one' .
+	self assert: sentencesFound size equals: 1.
+	self assert: sentencesFound includes: 'one sentence'.
+	
+	! !
+
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
 Object subclass: #OOStack
@@ -406,6 +423,23 @@ isBaseOfStack
 	^false ! !
 
 
+!classDefinition: #Prefix category: 'Stack-Exercise'!
+Object subclass: #Prefix
+	instanceVariableNames: 'string'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!Prefix methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 17:19:32'!
+initializeWith: aString
+	self assert: (aString isKindOf: String) description: 'El prefijo es invalido'.
+	string := aString ! !
+
+!Prefix methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 17:23:21'!
+string
+	^string .! !
+
+
 !classDefinition: #SentenceFinderByPrefix category: 'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
 	instanceVariableNames: 'stack'
@@ -420,13 +454,22 @@ find: aPrefix
 	^self select: sentencesConditionToSatisfy "
 	^self find: aPrefix inStack: stack.! !
 
-!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'bq 5/15/2022 16:55:58'!
+!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'bq 5/15/2022 17:22:39'!
 find: aPrefix inStack: aStack
-	| sentencesConditionToSatisfy |
-	(aPrefix isKindOf: String) ifFalse: [self error: self class invalidPrefixErrorMessage.].
+	| sentencesConditionToSatisfy prefijo|
+	
+	prefijo := Prefix new.
+	prefijo initializeWith: aPrefix .
+	
+	
+	"(aPrefix isKindOf: String) ifFalse: [self error: self class invalidPrefixErrorMessage.]."
 	(aPrefix = '' or: (aPrefix beginsWith: ' ')) ifTrue: [self error: self class invalidPrefixErrorMessage.].
 	(aStack isKindOf: OOStack ) ifFalse: [self error: self class invalidStackErrorMessage .].
-	sentencesConditionToSatisfy := [ :aSentence | aSentence beginsWith: aPrefix ] .
+	
+	
+	
+	sentencesConditionToSatisfy := [ :aSentence | aSentence beginsWith: prefijo string ] .
+	
 	^self select: sentencesConditionToSatisfy inStack: aStack! !
 
 
