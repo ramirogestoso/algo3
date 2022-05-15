@@ -423,23 +423,6 @@ isBaseOfStack
 	^false ! !
 
 
-!classDefinition: #Prefix category: 'Stack-Exercise'!
-Object subclass: #Prefix
-	instanceVariableNames: 'string'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!Prefix methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 17:19:32'!
-initializeWith: aString
-	self assert: (aString isKindOf: String) description: 'El prefijo es invalido'.
-	string := aString ! !
-
-!Prefix methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 17:23:21'!
-string
-	^string .! !
-
-
 !classDefinition: #SentenceFinderByPrefix category: 'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
 	instanceVariableNames: 'stack'
@@ -447,30 +430,33 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'bq 5/15/2022 16:28:16'!
+!SentenceFinderByPrefix methodsFor: 'asserting' stamp: 'rg 5/15/2022 18:17:09'!
+assertPrefixIsValid: aPrefix
+	| invalidPrefixConditions |
+	invalidPrefixConditions := { [:prefix | (prefix isKindOf: String) not]. [:prefix | prefix = '']. [:prefix | prefix beginsWith: ' '] } .
+	
+	invalidPrefixConditions 
+		detect: [ :aCondition | aCondition value: aPrefix ] 
+		ifFound: [ :condition | self error: self class invalidPrefixErrorMessage ] 
+		ifNone: [].
+	! !
+
+!SentenceFinderByPrefix methodsFor: 'asserting' stamp: 'rg 5/15/2022 18:14:35'!
+assertStackIsValid: aStack
+	(aStack isKindOf: OOStack ) ifFalse: [self error: self class invalidStackErrorMessage .].
+! !
+
+
+!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'rg 5/15/2022 18:14:57'!
 find: aPrefix 
-	"| sentencesConditionToSatisfy |
-	sentencesConditionToSatisfy := [ :aSentence | aSentence beginsWith: aPrefix ] .
-	^self select: sentencesConditionToSatisfy "
 	^self find: aPrefix inStack: stack.! !
 
-!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'bq 5/15/2022 17:22:39'!
+!SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'rg 5/15/2022 18:15:29'!
 find: aPrefix inStack: aStack
-	| sentencesConditionToSatisfy prefijo|
+	self assertPrefixIsValid: aPrefix .
+	self assertStackIsValid: aStack .
 	
-	prefijo := Prefix new.
-	prefijo initializeWith: aPrefix .
-	
-	
-	"(aPrefix isKindOf: String) ifFalse: [self error: self class invalidPrefixErrorMessage.]."
-	(aPrefix = '' or: (aPrefix beginsWith: ' ')) ifTrue: [self error: self class invalidPrefixErrorMessage.].
-	(aStack isKindOf: OOStack ) ifFalse: [self error: self class invalidStackErrorMessage .].
-	
-	
-	
-	sentencesConditionToSatisfy := [ :aSentence | aSentence beginsWith: prefijo string ] .
-	
-	^self select: sentencesConditionToSatisfy inStack: aStack! !
+	^self select: [ :aSentence | aSentence beginsWith: aPrefix ] inStack: aStack! !
 
 
 !SentenceFinderByPrefix methodsFor: 'adding' stamp: 'rg 5/12/2022 20:24:32'!
@@ -483,22 +469,21 @@ initialize
 	stack := OOStack new ! !
 
 
-!SentenceFinderByPrefix methodsFor: 'private' stamp: 'rg 5/12/2022 21:29:22'!
-stackAsCollection
-	^self stackAsCollection: stack! !
-
-!SentenceFinderByPrefix methodsFor: 'private' stamp: 'bq 5/15/2022 16:07:54'!
-stackAsCollection: aStack
-	| stackAsCollection |
-	stackAsCollection := OrderedCollection new .
-	aStack size timesRepeat: [ stackAsCollection add: aStack pop ] .
-	stackAsCollection reversed do: [ :anElement | aStack push: anElement ] .
-	^stackAsCollection ! !
-
-
-!SentenceFinderByPrefix methodsFor: 'private - enumerating' stamp: 'bq 5/15/2022 16:51:50'!
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'bq 5/15/2022 16:51:50'!
 select: aBlockToSatisfy inStack: aStack
 	^(self stackAsCollection: aStack) select: aBlockToSatisfy ! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'rg 5/15/2022 18:16:34'!
+stackAsCollection: aStack
+	| stackAsCollection |
+	
+	stackAsCollection := OrderedCollection new .
+	
+	aStack size timesRepeat: [ stackAsCollection add: aStack pop ] .
+	
+	stackAsCollection reversed do: [ :anElement | aStack push: anElement ] .
+	
+	^stackAsCollection ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
