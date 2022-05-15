@@ -136,6 +136,39 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 		
 ! !
 
+!OOStackTest methodsFor: 'test' stamp: 'bq 5/15/2022 18:57:15'!
+test11InitializeLimitedStackWithInvalidLimit
+
+self should: [ OOStack newWithLimit: -1]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = OOStackLimited limitIsNotValidErrorMessage ]
+! !
+
+!OOStackTest methodsFor: 'test' stamp: 'bq 5/15/2022 18:57:22'!
+test12InitializeLimitedStackWithNilLimit
+
+self should: [ OOStack newWithLimit: nil]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = OOStackLimited limitIsNotValidErrorMessage ]
+! !
+
+!OOStackTest methodsFor: 'test' stamp: 'bq 5/15/2022 18:57:33'!
+test13PushAnElementWhenStackIsFullShouldThrowError
+
+
+	| stack |
+	
+	stack := OOStack newWithLimit: 1.
+	stack push: 'something'.
+	self should: [stack push: 'something2']
+	raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = OOStackLimited NoMoreSpaceErrorMessage ]
+	
+	! !
+
 
 !classDefinition: #SentenceFinderByPrefixTest category: 'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
@@ -352,6 +385,56 @@ stackEmptyErrorDescription
 	
 	^ 'Stack is empty'! !
 
+
+!OOStack class methodsFor: 'initialization' stamp: 'bq 5/15/2022 18:56:33'!
+newWithLimit: aLimit
+	^OOStackLimited new initializeWith: aLimit .! !
+
+
+!classDefinition: #OOStackLimited category: 'Stack-Exercise'!
+OOStack subclass: #OOStackLimited
+	instanceVariableNames: 'limit'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStackLimited methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 18:46:38'!
+assertThatLimitIsValid
+	(limit isKindOf: SmallInteger) ifTrue: [limit > 0 ifTrue: [^self]].
+	self error: self class limitIsNotValidErrorMessage! !
+
+!OOStackLimited methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 18:54:18'!
+assertThereIsSpace
+	(self size < limit) ifFalse: [self error: self class NoMoreSpaceErrorMessage].! !
+
+!OOStackLimited methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 18:33:55'!
+initializeWith: aLimit
+	
+	stack := OrderedCollection new.
+	stack addFirst: OOStackElement newAsBaseOfStack .
+	limit := aLimit .
+	self assertThatLimitIsValid.
+	! !
+
+!OOStackLimited methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 18:26:15'!
+push: anElement
+	self assertThereIsSpace.
+	stack addFirst: (OOStackElement newWithValue: anElement) .! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'OOStackLimited class' category: 'Stack-Exercise'!
+OOStackLimited class
+	instanceVariableNames: ''!
+
+!OOStackLimited class methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 18:32:17'!
+NoMoreSpaceErrorMessage
+	^'No hay mas espacio'! !
+
+!OOStackLimited class methodsFor: 'as yet unclassified' stamp: 'bq 5/15/2022 18:39:50'!
+limitIsNotValidErrorMessage
+	^'El limite no es valido'! !
+
 
 !classDefinition: #OOStackElement category: 'Stack-Exercise'!
 Object subclass: #OOStackElement
@@ -430,23 +513,6 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'asserting' stamp: 'rg 5/15/2022 18:17:09'!
-assertPrefixIsValid: aPrefix
-	| invalidPrefixConditions |
-	invalidPrefixConditions := { [:prefix | (prefix isKindOf: String) not]. [:prefix | prefix = '']. [:prefix | prefix beginsWith: ' '] } .
-	
-	invalidPrefixConditions 
-		detect: [ :aCondition | aCondition value: aPrefix ] 
-		ifFound: [ :condition | self error: self class invalidPrefixErrorMessage ] 
-		ifNone: [].
-	! !
-
-!SentenceFinderByPrefix methodsFor: 'asserting' stamp: 'rg 5/15/2022 18:14:35'!
-assertStackIsValid: aStack
-	(aStack isKindOf: OOStack ) ifFalse: [self error: self class invalidStackErrorMessage .].
-! !
-
-
 !SentenceFinderByPrefix methodsFor: 'enumerating' stamp: 'rg 5/15/2022 18:14:57'!
 find: aPrefix 
 	^self find: aPrefix inStack: stack.! !
@@ -473,6 +539,10 @@ initialize
 select: aBlockToSatisfy inStack: aStack
 	^(self stackAsCollection: aStack) select: aBlockToSatisfy ! !
 
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'rg 5/12/2022 21:29:22'!
+stackAsCollection
+	^self stackAsCollection: stack! !
+
 !SentenceFinderByPrefix methodsFor: 'private' stamp: 'rg 5/15/2022 18:16:34'!
 stackAsCollection: aStack
 	| stackAsCollection |
@@ -484,6 +554,28 @@ stackAsCollection: aStack
 	stackAsCollection reversed do: [ :anElement | aStack push: anElement ] .
 	
 	^stackAsCollection ! !
+
+
+!SentenceFinderByPrefix methodsFor: 'private - enumerating' stamp: 'rg 5/12/2022 21:30:54'!
+select: aBlockToSatisfy
+	^self select: aBlockToSatisfy inStack: stack! !
+
+
+!SentenceFinderByPrefix methodsFor: 'asserting' stamp: 'rg 5/15/2022 18:17:09'!
+assertPrefixIsValid: aPrefix
+	| invalidPrefixConditions |
+	invalidPrefixConditions := { [:prefix | (prefix isKindOf: String) not]. [:prefix | prefix = '']. [:prefix | prefix beginsWith: ' '] } .
+	
+	invalidPrefixConditions 
+		detect: [ :aCondition | aCondition value: aPrefix ] 
+		ifFound: [ :condition | self error: self class invalidPrefixErrorMessage ] 
+		ifNone: [].
+	! !
+
+!SentenceFinderByPrefix methodsFor: 'asserting' stamp: 'rg 5/15/2022 18:14:35'!
+assertStackIsValid: aStack
+	(aStack isKindOf: OOStack ) ifFalse: [self error: self class invalidStackErrorMessage .].
+! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
