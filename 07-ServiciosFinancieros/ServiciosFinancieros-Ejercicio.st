@@ -165,6 +165,22 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
+!classDefinition: #TransactionDeposit category: 'ServiciosFinancieros-Ejercicio'!
+Deposit subclass: #TransactionDeposit
+	instanceVariableNames: 'counterpart'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!TransactionDeposit methodsFor: 'as yet unclassified' stamp: 'bq 6/5/2022 17:18:54'!
+isCounterpart: aWithdraw
+	^counterpart = aWithdraw ! !
+
+!TransactionDeposit methodsFor: 'as yet unclassified' stamp: 'bq 6/5/2022 17:17:14'!
+setCounterpart: aWithdraw
+	counterpart := aWithdraw .! !
+
+
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Ejercicio'!
 AccountTransaction subclass: #Withdraw
 	instanceVariableNames: 'value'
@@ -198,6 +214,18 @@ Withdraw class
 for: aValue
 
 	^ self new initializeFor: aValue ! !
+
+
+!classDefinition: #TransactionWithdraw category: 'ServiciosFinancieros-Ejercicio'!
+Withdraw subclass: #TransactionWithdraw
+	instanceVariableNames: 'counterpart'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!TransactionWithdraw methodsFor: 'as yet unclassified' stamp: 'bq 6/5/2022 17:16:42'!
+setCounterpart: aDeposit
+	counterpart := aDeposit .! !
 
 
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
@@ -249,10 +277,17 @@ Object subclass: #TransactionBetweenAccounts
 TransactionBetweenAccounts class
 	instanceVariableNames: ''!
 
-!TransactionBetweenAccounts class methodsFor: 'instance creation' stamp: 'rg 6/2/2022 21:53:14'!
+!TransactionBetweenAccounts class methodsFor: 'instance creation' stamp: 'bq 6/5/2022 17:14:55'!
 for: anAcountOfPesos from: aSenderAccount to: aReceptiveAccount
-	"DO NOT FORGET TO RENAME COLLABORATORS AND REMOVE THIS COMMENT!!!!"
-	"self shouldBeImplemented.
-	^self new initializeFor: aSimpleMeasure from: aReceptiveAccount to: aReceptiveAccount3 "
-	Deposit for: anAcountOfPesos on: aReceptiveAccount .
-	Withdraw for: anAcountOfPesos on: aSenderAccount .! !
+	| deposito retiro |
+	
+	deposito _ TransactionDeposit register: anAcountOfPesos on: aReceptiveAccount .
+	retiro _ TransactionWithdraw register: anAcountOfPesos on: aSenderAccount .
+	
+	self linkDeposit:  deposito andWithraw: retiro.! !
+
+!TransactionBetweenAccounts class methodsFor: 'instance creation' stamp: 'bq 6/5/2022 17:15:58'!
+linkDeposit: aDeposit andWithdraw: aWithdraw
+
+	aDeposit setCounterpart: aWithdraw .
+	aWithdraw  setCounterpart: aDeposit .! !
