@@ -316,7 +316,6 @@ AccountTransaction subclass: #Deposit
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-
 !Deposit methodsFor: 'as yet unclassified' stamp: 'rg 6/2/2022 21:40:15'!
 impactToBalance: aBalance
 	^aBalance + self value! !
@@ -345,7 +344,6 @@ AccountTransaction subclass: #Withdraw
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-
 !Withdraw methodsFor: 'as yet unclassified' stamp: 'rg 6/2/2022 21:40:35'!
 impactToBalance: aBalance
 	^aBalance - self value! !
@@ -367,8 +365,32 @@ setCounterpart: aDeposit
 	counterpart := aDeposit .! !
 
 
+!classDefinition: #Entity category: 'ServiciosFinancieros-Ejercicio'!
+Object subclass: #Entity
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!Entity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:40:01'!
+balance
+	^self subclassResponsibility ! !
+
+!Entity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:41:19'!
+hasRegisteder
+	^self subclassResponsibility ! !
+
+!Entity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:40:53'!
+register: algo
+	^self subclassResponsibility ! !
+
+!Entity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:41:05'!
+transfers
+	^self subclassResponsibility ! !
+
+
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #Portfolio
+Entity subclass: #Portfolio
 	instanceVariableNames: 'cuentasYPortfolios'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -379,9 +401,50 @@ initialize
 	cuentasYPortfolios := Set new .! !
 
 
-!Portfolio methodsFor: 'main protocol' stamp: 'rg 6/6/2022 21:27:02'!
+!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:42:22'!
 add: anAccountOrPortfolio 
+
+
+
+	self assert1: anAccountOrPortfolio 
+	self assert2: anAccountOrPortfolio 
+	self assert3: anAccountOrPortfolio 
+	self assert4: anAccountOrPortfolio 
+	self assert5: anAccountOrPortfolio 
+
 	cuentasYPortfolios add: anAccountOrPortfolio ! !
+
+!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:55:30'!
+assert1: anAccountOrPortfolio
+
+	"self deny: (cuentasYPortfolios includes: anAccountOrPortfolio ). "
+	"reemplazar por msg polimorfico que tambien checkee en porfolios hijos para el assert2"! !
+
+!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:46:42'!
+assert2: anAccountOrPortfolio
+
+	"ver en assert1"! !
+
+!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:55:36'!
+assert3: anAccountOrPortfolio
+
+	"self deny: (self = anAccountOrPortfolio )"! !
+
+!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:55:21'!
+assert4: anAccountOrPortfolio
+
+"para este hace falta que cada portfolio sepa su padre, un metodo escala hasta encontrar el portfolio padre del resto, que tiene a nil de padre y hacerle assert1(o 2) a ese"
+
+	"self encontrarPadre assert1."! !
+
+!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:54:39'!
+assert5: anAccountOrPortfolio
+
+	"
+	
+	cuentasYPortfolios anySatisfy: [ :cosa | anAccountOrPortfolio devolverCuentasYPortfoliosHijos includes: cosa]."
+	
+! !
 
 !Portfolio methodsFor: 'main protocol' stamp: 'rg 6/6/2022 21:27:13'!
 balance
@@ -400,7 +463,7 @@ transactions
 
 
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #ReceptiveAccount
+Entity subclass: #ReceptiveAccount
 	instanceVariableNames: 'transactions'
 	classVariableNames: ''
 	poolDictionaries: ''
