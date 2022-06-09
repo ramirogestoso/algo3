@@ -1,3 +1,122 @@
+!classDefinition: #ExtraPortfolioTest category: 'ServiciosFinancieros-Ejercicio'!
+TestCase subclass: #ExtraPortfolioTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!ExtraPortfolioTest methodsFor: 'as yet unclassified' stamp: 'bq 6/9/2022 16:34:05'!
+test01PortfolioCantAddAnAccountTwice
+
+
+
+	| portfolio account1 | 
+	
+	portfolio := Portfolio new .
+	account1 := ReceptiveAccount new .
+	
+	portfolio add: account1 .
+	
+	self should: [portfolio add: account1.] raise: Error withExceptionDo: [:anError | anError messageText = 'La cuenta ya esta incluida en el portafolio'].
+	! !
+
+!ExtraPortfolioTest methodsFor: 'as yet unclassified' stamp: 'bq 6/9/2022 16:34:59'!
+test02PortfolioCantAddAnAccountThatIsPartOfAChildrenPortfolio
+
+
+
+	| portfolio account1 portfolio2| 
+	
+	portfolio := Portfolio new .
+	portfolio2 := Portfolio new .
+	account1 := ReceptiveAccount new .
+	
+	
+	portfolio add: account1 .
+	portfolio2 add: portfolio .
+	
+	self should: [portfolio2 add: account1.] raise: Error withExceptionDo: [:anError | anError messageText = 'La cuenta ya esta incluida en el portafolio' .].
+	! !
+
+!ExtraPortfolioTest methodsFor: 'as yet unclassified' stamp: 'bq 6/9/2022 16:37:28'!
+test03PortfolioCantBeAddedToItself
+
+
+
+	| portfolio| 
+	
+	portfolio := Portfolio new .
+	
+	self should: [portfolio add: portfolio] raise: Error withExceptionDo: [:anError | anError messageText = 'Un portfolio no puede incluirse a si mismo' .].
+	! !
+
+!ExtraPortfolioTest methodsFor: 'as yet unclassified' stamp: 'bq 6/9/2022 16:38:08'!
+test04PortfolioCantAddAnAccountThatIsPartOfAFatherPortfolio
+
+
+
+
+	| portfolio account1 portfolio2| 
+	
+	portfolio := Portfolio new .
+	portfolio2 := Portfolio new .
+	account1 := ReceptiveAccount new .
+	
+	
+	portfolio2 add: account1 .
+	portfolio2 add: portfolio .
+	
+	
+	
+	self should: [portfolio add: account1] raise: Error withExceptionDo: [:anError | anError messageText = 'La cuenta ya esta incluida en el portafolio' .].
+	! !
+
+!ExtraPortfolioTest methodsFor: 'as yet unclassified' stamp: 'bq 6/9/2022 16:14:15'!
+test05ButMoreComplex
+	
+	| portfolio portfolio2 portfolio3 portfolio4 portfolio5 portfolio6 account1 account2 account3 account4 | 
+	
+	portfolio := Portfolio new .
+	portfolio2 := Portfolio new .
+	portfolio3 := Portfolio new .
+	portfolio4 := Portfolio new .
+	portfolio5 := Portfolio new .
+	portfolio6 := Portfolio new .
+	account1 := ReceptiveAccount new .
+	account2 := ReceptiveAccount new .
+	account3 := ReceptiveAccount new .
+	account4 := ReceptiveAccount new .
+	
+	
+	portfolio3 add: portfolio4.
+	portfolio add: portfolio3.
+	portfolio add: account1 .  "arbol 1"
+	portfolio3 add: account4 . 
+	
+	portfolio2 add: portfolio5.
+	portfolio2 add: portfolio6. "arbol2"
+	portfolio5 add: account2 . 
+	portfolio5 add: account3 . 
+	portfolio6 add: account4 . 
+	
+	self should: [portfolio4 add: portfolio2.] raise: Error withExceptionDo: [:anError | anError messageText = 'Los portfolios tienen cuentas en comun' .].! !
+
+!ExtraPortfolioTest methodsFor: 'as yet unclassified' stamp: 'bq 6/9/2022 16:38:34'!
+test05CantAddPortfolioGroupsWithAccountsInCommon
+	
+	| portfolio account1 portfolio2| 
+	
+	portfolio := Portfolio new .
+	portfolio2 := Portfolio new .
+	account1 := ReceptiveAccount new .
+	
+	
+	portfolio2 add: account1 .
+	portfolio add: account1 .
+	
+	self should: [portfolio add: portfolio2.] raise: Error withExceptionDo: [:anError | anError messageText = 'Los portfolios tienen cuentas en comun' .].! !
+
+
 !classDefinition: #PortfolioTest category: 'ServiciosFinancieros-Ejercicio'!
 TestCase subclass: #PortfolioTest
 	instanceVariableNames: ''
@@ -5,8 +124,8 @@ TestCase subclass: #PortfolioTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!PortfolioTest methodsFor: 'test' stamp: 'rg 6/6/2022 21:19:45'!
-test01
+!PortfolioTest methodsFor: 'test' stamp: 'bq 6/9/2022 16:29:47'!
+test01PortfolioBalanceEqualsSumOfTheAcountsBalance
 
 	| portfolio account1 account2 | 
 	
@@ -23,8 +142,8 @@ test01
 	self assert: 150*peso equals: portfolio balance .
 	! !
 
-!PortfolioTest methodsFor: 'test' stamp: 'rg 6/6/2022 21:20:54'!
-test02
+!PortfolioTest methodsFor: 'test' stamp: 'bq 6/9/2022 16:30:25'!
+test02PortfolioRegistersEveryTransactionOfHisAccounts
 
 	| portfolio account1 account2 transacc1 transacc2 | 
 	
@@ -42,8 +161,8 @@ test02
 	self assert: (portfolio hasRegistered: transacc2 ).
 	! !
 
-!PortfolioTest methodsFor: 'test' stamp: 'rg 6/6/2022 21:20:58'!
-test03
+!PortfolioTest methodsFor: 'test' stamp: 'bq 6/9/2022 16:31:19'!
+test03PortfolioHasAllTheTransactionsOfHisAccounts
 
 	| portfolio account1 account2 transactions | 
 	
@@ -62,8 +181,8 @@ test03
 	
 	! !
 
-!PortfolioTest methodsFor: 'test' stamp: 'rg 6/6/2022 21:21:05'!
-test04
+!PortfolioTest methodsFor: 'test' stamp: 'bq 6/9/2022 16:32:27'!
+test04PortfolioCanContainPortfoliosThatAccountToTheBalance
 
 	| portfolio1 portfolio2 account1 account2 account3 | 
 	
@@ -85,8 +204,8 @@ test04
 	self assert: 1110*peso equals: portfolio2 balance.
 	! !
 
-!PortfolioTest methodsFor: 'test' stamp: 'rg 6/6/2022 21:21:10'!
-test05
+!PortfolioTest methodsFor: 'test' stamp: 'bq 6/9/2022 16:33:09'!
+test05PortfolioRegistersEveryTransactionOfHisChildrenPortfoliosToo
 
 	| portfolio1 portfolio2 account1 account2 account3 transacc | 
 	
@@ -107,8 +226,8 @@ test05
 	
 	self assert: (portfolio2 hasRegistered: transacc ).! !
 
-!PortfolioTest methodsFor: 'test' stamp: 'rg 6/6/2022 21:21:18'!
-test06
+!PortfolioTest methodsFor: 'test' stamp: 'bq 6/9/2022 16:33:40'!
+test06PortfolioHasAllTheTransactionsOfHisAccountsAndChildrenPortfolios
 
 	| portfolio1 portfolio2 account1 account2 account3 transacciones | 
 	
@@ -230,8 +349,8 @@ TestCase subclass: #TransferTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!TransferTest methodsFor: 'test' stamp: 'rg 6/6/2022 21:18:05'!
-test01
+!TransferTest methodsFor: 'test' stamp: 'bq 6/9/2022 16:27:57'!
+test01TransfersTakesMoneyFromAnAccountAndGivesItToAnotherAccount
 	| account account2 |
 	account := ReceptiveAccount new.
 	account2 := ReceptiveAccount new .
@@ -242,8 +361,8 @@ test01
 	self assert: account balance equals: 0*peso.
 	self assert: account2 balance equals: 50*peso .! !
 
-!TransferTest methodsFor: 'test' stamp: 'rg 6/6/2022 21:18:34'!
-test02
+!TransferTest methodsFor: 'test' stamp: 'bq 6/9/2022 16:28:52'!
+test02TransferValueIsEqualToTheMoneyRecievedOnTheSecondAccount
 	| account account2 transfer |
 	account := ReceptiveAccount new.
 	account2 := ReceptiveAccount new .
@@ -253,8 +372,8 @@ test02
 	
 	self assert: 50*peso equals: transfer value .! !
 
-!TransferTest methodsFor: 'test' stamp: 'rg 6/6/2022 21:18:55'!
-test03
+!TransferTest methodsFor: 'test' stamp: 'bq 6/9/2022 16:29:15'!
+test03TransferPartsKnowTheirCounterpart
 	| account account2 transfer |
 	account := ReceptiveAccount new.
 	account2 := ReceptiveAccount new .
@@ -365,32 +484,49 @@ setCounterpart: aDeposit
 	counterpart := aDeposit .! !
 
 
-!classDefinition: #Entity category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #Entity
-	instanceVariableNames: ''
+!classDefinition: #BankingEntity category: 'ServiciosFinancieros-Ejercicio'!
+Object subclass: #BankingEntity
+	instanceVariableNames: 'father'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!Entity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:40:01'!
+!BankingEntity methodsFor: 'as yet unclassified' stamp: 'bq 6/9/2022 15:19:11'!
+addAsFather: aPortfolio
+	father := aPortfolio .! !
+
+!BankingEntity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:40:01'!
 balance
 	^self subclassResponsibility ! !
 
-!Entity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:41:19'!
+!BankingEntity methodsFor: 'as yet unclassified' stamp: 'bq 6/9/2022 16:01:00'!
+findFather
+	
+	self subclassResponsibility .! !
+
+!BankingEntity methodsFor: 'as yet unclassified' stamp: 'bq 6/9/2022 16:18:34'!
+hasJointAccounts: aPortfolio
+	self subclassResponsibility .! !
+
+!BankingEntity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:41:19'!
 hasRegisteder
 	^self subclassResponsibility ! !
 
-!Entity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:40:53'!
+!BankingEntity methodsFor: 'as yet unclassified' stamp: 'bq 6/9/2022 15:11:04'!
+includes: anAccount
+	self subclassResponsibility .! !
+
+!BankingEntity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:40:53'!
 register: algo
 	^self subclassResponsibility ! !
 
-!Entity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:41:05'!
+!BankingEntity methodsFor: 'as yet unclassified' stamp: 'bq 6/6/2022 23:41:05'!
 transfers
 	^self subclassResponsibility ! !
 
 
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Ejercicio'!
-Entity subclass: #Portfolio
+BankingEntity subclass: #Portfolio
 	instanceVariableNames: 'cuentasYPortfolios'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -401,50 +537,15 @@ initialize
 	cuentasYPortfolios := Set new .! !
 
 
-!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:42:22'!
+!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/9/2022 16:21:09'!
 add: anAccountOrPortfolio 
 
+	self assertJunctionIsValid: anAccountOrPortfolio .
 
-
-	self assert1: anAccountOrPortfolio 
-	self assert2: anAccountOrPortfolio 
-	self assert3: anAccountOrPortfolio 
-	self assert4: anAccountOrPortfolio 
-	self assert5: anAccountOrPortfolio 
-
-	cuentasYPortfolios add: anAccountOrPortfolio ! !
-
-!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:55:30'!
-assert1: anAccountOrPortfolio
-
-	"self deny: (cuentasYPortfolios includes: anAccountOrPortfolio ). "
-	"reemplazar por msg polimorfico que tambien checkee en porfolios hijos para el assert2"! !
-
-!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:46:42'!
-assert2: anAccountOrPortfolio
-
-	"ver en assert1"! !
-
-!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:55:36'!
-assert3: anAccountOrPortfolio
-
-	"self deny: (self = anAccountOrPortfolio )"! !
-
-!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:55:21'!
-assert4: anAccountOrPortfolio
-
-"para este hace falta que cada portfolio sepa su padre, un metodo escala hasta encontrar el portfolio padre del resto, que tiene a nil de padre y hacerle assert1(o 2) a ese"
-
-	"self encontrarPadre assert1."! !
-
-!Portfolio methodsFor: 'main protocol' stamp: 'bq 6/6/2022 23:54:39'!
-assert5: anAccountOrPortfolio
-
-	"
+	cuentasYPortfolios add: anAccountOrPortfolio .
 	
-	cuentasYPortfolios anySatisfy: [ :cosa | anAccountOrPortfolio devolverCuentasYPortfoliosHijos includes: cosa]."
-	
-! !
+	anAccountOrPortfolio addAsFather: self.
+	! !
 
 !Portfolio methodsFor: 'main protocol' stamp: 'rg 6/6/2022 21:27:13'!
 balance
@@ -461,9 +562,77 @@ transactions
 	cuentasYPortfolios collect: [ :accountOrPortfolio | collection addAll: accountOrPortfolio transactions ] .
 	^collection ! !
 
+
+!Portfolio methodsFor: 'assertions-private' stamp: 'bq 6/9/2022 16:36:16'!
+assertAnAccountDoesntEnterAPortfolioGroupThatIsAlreadyAPartOf: anAccountOrPortfolio
+
+"para este hace falta que cada portfolio sepa su padre, un metodo escala hasta encontrar el portfolio padre del resto, que tiene a nil de padre y hacerle assert1(o 2) a ese"
+
+	"self encontrarPadre assert1."
+	"assert4"
+	self findFather assertAnAccountIsntAlreadyIncludedInThePortfolio: anAccountOrPortfolio .
+	! !
+
+!Portfolio methodsFor: 'assertions-private' stamp: 'bq 6/9/2022 16:35:52'!
+assertAnAccountIsntAlreadyIncludedInThePortfolio: anAccountOrPortfolio
+	"assert2"
+	(self includes: anAccountOrPortfolio ) ifTrue: [self error: 'La cuenta ya esta incluida en el portafolio'].! !
+
+!Portfolio methodsFor: 'assertions-private' stamp: 'bq 6/9/2022 16:37:06'!
+assertJunctionIsValid: anAccountOrPortfolio
+	
+	self assertPortfolioIsNotBeingAddedToItself: anAccountOrPortfolio .
+	
+	self assertAnAccountDoesntEnterAPortfolioGroupThatIsAlreadyAPartOf: anAccountOrPortfolio .
+	
+	(anAccountOrPortfolio isKindOf: Portfolio) ifTrue: [self assertPortfolioGroupsDontHaveAccountsInCommon: anAccountOrPortfolio] .! !
+
+!Portfolio methodsFor: 'assertions-private' stamp: 'bq 6/9/2022 16:35:31'!
+assertPortfolioGroupsDontHaveAccountsInCommon: anAccountOrPortfolio
+
+	"assert5"
+	
+	"cuentasYPortfolios anySatisfy: [ :cosa | anAccountOrPortfolio devolverCuentasYPortfoliosHijos includes: cosa]."
+	
+	| thisfather otherfather|
+	thisfather := self findFather .
+	otherfather  := anAccountOrPortfolio findFather .
+	"
+	(anAccountOrPortfolio findFather returnAllAccounts anySatisfy: [ :anAccount | thisfather includes: anAccount ]) ifTrue: [self error: 'El portfolio incluye una cuenta que esta en este portfolio'.]."
+	
+	(thisfather hasJointAccounts: otherfather ) ifTrue: [self error: 'Los portfolios tienen cuentas en comun'].
+! !
+
+!Portfolio methodsFor: 'assertions-private' stamp: 'bq 6/9/2022 16:35:40'!
+assertPortfolioIsNotBeingAddedToItself: anAccountOrPortfolio
+	"assert3"
+	(self = anAccountOrPortfolio ) ifTrue: [self error: 'Un portfolio no puede incluirse a si mismo'].! !
+
+
+!Portfolio methodsFor: 'private' stamp: 'bq 6/9/2022 15:22:50'!
+findFather
+	
+	
+	(father = nil) ifTrue: [^self].
+	^father findFather .
+	! !
+
+!Portfolio methodsFor: 'private' stamp: 'bq 6/9/2022 16:17:57'!
+hasJointAccounts: aPortfolio
+
+	
+
+	^(cuentasYPortfolios anySatisfy: [:anAccount | aPortfolio includes: anAccount ] )
+	or: 
+	(cuentasYPortfolios anySatisfy: [:aChildrenPortfolio | aChildrenPortfolio hasJointAccounts: aPortfolio .]).! !
+
+!Portfolio methodsFor: 'private' stamp: 'bq 6/9/2022 15:12:08'!
+includes: anAccount
+	^cuentasYPortfolios anySatisfy: [:cuentaOPortfolio | cuentaOPortfolio includes: anAccount ].! !
+
 
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
-Entity subclass: #ReceptiveAccount
+BankingEntity subclass: #ReceptiveAccount
 	instanceVariableNames: 'transactions'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -496,6 +665,23 @@ register: aTransaction
 transactions 
 
 	^ transactions copy! !
+
+
+!ReceptiveAccount methodsFor: 'private' stamp: 'bq 6/9/2022 16:00:51'!
+findFather
+	
+	
+	^father findFather .
+	! !
+
+!ReceptiveAccount methodsFor: 'private' stamp: 'bq 6/9/2022 16:18:54'!
+hasJointAccounts: aPortfolio
+	^false.
+! !
+
+!ReceptiveAccount methodsFor: 'private' stamp: 'bq 6/9/2022 15:12:26'!
+includes: AnAccount
+	^self = AnAccount .! !
 
 
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Ejercicio'!
