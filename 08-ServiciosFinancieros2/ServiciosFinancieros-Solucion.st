@@ -310,67 +310,136 @@ TestCase subclass: #ReportTest
 	category: 'ServiciosFinancieros-Solucion'!
 
 
-!classDefinition: #SummaryReportTest category: 'ServiciosFinancieros-Solucion'!
-ReportTest subclass: #SummaryReportTest
+!classDefinition: #AccountSummaryTest category: 'ServiciosFinancieros-Solucion'!
+ReportTest subclass: #AccountSummaryTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!SummaryReportTest methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:58:37'!
-test01
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'bq 6/12/2022 19:27:36'!
+test01ReportForEmptyAccountOnlyHasTheBalance
 
 	| account report |
 	
 	account := ReceptiveAccount new .
-	report := SummaryReport from: account .
+	report := AccountSummary from: account .
 	
 	self assert: 1 equals: report size .
 ! !
 
-!SummaryReportTest methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:58:44'!
-test02
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'bq 6/12/2022 19:28:15'!
+test02ReportForAnAccountHasTheBalanceAndTheTransactions
 
 	| account report |
 	
 	account := ReceptiveAccount new .
 	Deposit register: 50*peso on: account.
-	report := SummaryReport from: account .
+	report := AccountSummary from: account .
 	
 	self assert: 2 equals: report size .
 ! !
 
-!SummaryReportTest methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 19:00:10'!
-test03
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'bq 6/12/2022 19:29:09'!
+test03ReportIncludesAllTypesOfTransaction
 
 	| account account2 report1 report2 |
 	
 	account := ReceptiveAccount new .
 	account2 := ReceptiveAccount new .
-	Deposit register: 50*peso on: account.
+	Deposit register: 100*peso on: account.
 	Withdraw register: 50*peso on: account.
-	Transfer amount: 50*peso from: account2 to: account.
-	report1 := SummaryReport from: account .
-	report2 := SummaryReport from: account2 .
+	Transfer amount: 30*peso from: account2 to: account.
 	
-	self assert: report1 includes: 'Deposito por 50 * pesos'.
+	Transfer amount: 20*peso from: account to: account2.
+	
+	report1 := AccountSummary from: account .
+	report2 := AccountSummary from: account2 .
+	
+	self assert: report1 includes: 'Deposito por 100 * pesos'.
 	self assert: report1 includes: 'Extraccion por 50 * pesos'.
-	self assert: report1 includes: 'Entrada por transferencia de 50 * pesos'.
-	self deny: (report1 includes: 'Salida por transferencia de 50 * pesos').
-	self assert: report2 includes: 'Salida por transferencia de 50 * pesos'.
+	self assert: report1 includes: 'Entrada por transferencia de 30 * pesos'.
+	self deny: (report1 includes: 'Salida por transferencia de 30 * pesos').
+	self assert: report2 includes: 'Salida por transferencia de 30 * pesos'.
+	
+	self assert: report1 includes: 'Salida por transferencia de 20 * pesos'.
+	self assert: report2 includes: 'Entrada por transferencia de 20 * pesos'.
+	
+	self deny: (report1 includes: 'Entrada por transferencia de 20 * pesos').
 ! !
 
-!SummaryReportTest methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:52:11'!
-test04
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'bq 6/12/2022 19:29:36'!
+test04ReportIncludesBalance
 
 	| account report |
 	
 	account := ReceptiveAccount new .
 	Deposit register: 50*peso on: account.
 	Withdraw register: 40*peso on: account .
-	report := SummaryReport from: account .
+	report := AccountSummary from: account .
 	
 	self assert: report includes: 'Balance = 10 * pesos'
+! !
+
+
+!classDefinition: #TransferNetTest category: 'ServiciosFinancieros-Solucion'!
+ReportTest subclass: #TransferNetTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'bq 6/12/2022 19:33:10'!
+test01ReportTransferNetForEmptyAccountIsZero
+
+
+
+	| account report |
+	
+	account := ReceptiveAccount new .
+	report := TransferNet from: account .
+	
+	self assert: (report isTransferNet: 0*peso).
+! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'bq 6/12/2022 19:32:20'!
+test02ReportTransferNetConsidersTransferenceOperations
+
+
+
+	| account account2 report |
+	
+	account := ReceptiveAccount new .
+	account2 := ReceptiveAccount new .
+	
+	Transfer amount: 10*peso from: account to: account2.
+	Transfer amount: 30*peso from: account2 to: account.
+	
+	report := TransferNet from: account .
+	
+	self assert: (report isTransferNet: 20*peso).
+
+! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'bq 6/12/2022 19:32:58'!
+test03ReportTransferNetDoesntConsiderTransactionsThatAreNotTransferences
+
+
+
+	| account account2 report |
+	
+	account := ReceptiveAccount new .
+	account2 := ReceptiveAccount new .
+	
+	Transfer amount: 10*peso from: account to: account2.
+	Transfer amount: 30*peso from: account2 to: account.
+	Deposit register: 30*peso on: account .
+	Withdraw register: 30000*peso on: account .
+	
+	
+	report := TransferNet from: account .
+	
+	self assert: (report isTransferNet: 20*peso).
 ! !
 
 
@@ -710,13 +779,6 @@ isComposedBy: anAccount
 	^self = anAccount ! !
 
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'rgrg 6/9/2022 21:51:29'!
-summaryReport
-	| coleccion |
-	coleccion := OrderedCollection new.
-	transactions do: [:aTransaction | aTransaction addToReport: coleccion ].
-	^coleccion .! !
-
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Solucion'!
 Object subclass: #AccountTransaction
@@ -725,9 +787,9 @@ Object subclass: #AccountTransaction
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!AccountTransaction methodsFor: 'value' stamp: 'rgrg 6/9/2022 21:51:08'!
+!AccountTransaction methodsFor: 'value' stamp: 'bq 6/12/2022 19:38:36'!
 addToReport: aReport
-	aReport add: (self messageForReport )! !
+	aReport add: (self behaviourForReport )! !
 
 !AccountTransaction methodsFor: 'value' stamp: 'HernanWilkinson 9/12/2011 12:25'!
 value 
@@ -740,8 +802,9 @@ affectBalance: aBalance
 
 	self subclassResponsibility ! !
 
-!AccountTransaction methodsFor: 'balance' stamp: 'rgrg 6/9/2022 21:49:07'!
-messageForReport
+
+!AccountTransaction methodsFor: 'report' stamp: 'bq 6/12/2022 19:42:09'!
+behaviourForReport: aReport
 	self subclassResponsibility .! !
 
 
@@ -770,9 +833,9 @@ affectBalance: aBalance
 	^aBalance + value ! !
 
 
-!Deposit methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:45:25'!
-messageForReport: aReport 
-	^aReport messageForDeposit: self value! !
+!Deposit methodsFor: 'report' stamp: 'bq 6/12/2022 19:46:30'!
+behaviourForReport: aReport 
+	^aReport procedureForDeposit: self value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -839,10 +902,6 @@ TransferLeg subclass: #TransferDepositLeg
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!TransferDepositLeg methodsFor: 'accessing' stamp: 'rgrg 6/12/2022 18:44:30'!
-messageForReport: aReport 
-	^aReport messageForTransferDepositLeg: self value! !
-
 !TransferDepositLeg methodsFor: 'accessing' stamp: 'LL 9/20/2020 22:26:10'!
 withdrawLeg
 
@@ -853,6 +912,11 @@ withdrawLeg
 affectBalance: aBalance
 
 	^aBalance + self value! !
+
+
+!TransferDepositLeg methodsFor: 'report' stamp: 'bq 6/12/2022 19:46:41'!
+behaviourForReport: aReport 
+	^aReport procedureForTransferDepositLeg: self value! !
 
 
 !classDefinition: #TransferWithdrawLeg category: 'ServiciosFinancieros-Solucion'!
@@ -867,15 +931,16 @@ depositLeg
 
 	^transfer depositLeg! !
 
-!TransferWithdrawLeg methodsFor: 'accessing' stamp: 'rgrg 6/12/2022 18:44:52'!
-messageForReport: aReport 
-	^aReport messageForTransferWithdrawLeg: self value! !
-
 
 !TransferWithdrawLeg methodsFor: 'balance' stamp: 'LL 9/20/2020 22:27:55'!
 affectBalance: aBalance
 
 	^aBalance - self value! !
+
+
+!TransferWithdrawLeg methodsFor: 'report' stamp: 'bq 6/12/2022 19:46:49'!
+behaviourForReport: aReport 
+	^aReport procedureForTransferWithdrawLeg: self value! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Solucion'!
@@ -891,10 +956,6 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Withdraw methodsFor: 'value' stamp: 'rgrg 6/12/2022 18:45:10'!
-messageForReport: aReport 
-	^aReport messageForWithdraw: self value! !
-
 !Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:33'!
 value
 
@@ -905,6 +966,11 @@ value
 affectBalance: aBalance
 
 	^aBalance - value! !
+
+
+!Withdraw methodsFor: 'report' stamp: 'bq 6/12/2022 19:46:57'!
+behaviourForReport: aReport 
+	^aReport procedureForWithdraw: self value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -931,66 +997,131 @@ register: aValue on: account
 
 !classDefinition: #Report category: 'ServiciosFinancieros-Solucion'!
 Object subclass: #Report
-	instanceVariableNames: 'reports'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Solucion'!
-
-
-!classDefinition: #SummaryReport category: 'ServiciosFinancieros-Solucion'!
-Report subclass: #SummaryReport
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:36:31'!
-includes: aReportMessage
-	^reports includes: aReportMessage ! !
+!Report methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:29'!
+procedureForDeposit: depositValue
+	self subclassResponsibility .! !
 
-!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:55:01'!
+!Report methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:40'!
+procedureForTransferDepositLeg: depositValue
+	self subclassResponsibility .! !
+
+!Report methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:48'!
+procedureForTransferWithdrawLeg: depositValue
+	self subclassResponsibility .! !
+
+!Report methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:57'!
+procedureForWithdraw: depositValue
+	self subclassResponsibility .! !
+
+
+!Report methodsFor: 'initialization' stamp: 'bq 6/12/2022 19:36:19'!
+initializeFor: anAccount
+	self subclassResponsibility .! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Report class' category: 'ServiciosFinancieros-Solucion'!
+Report class
+	instanceVariableNames: ''!
+
+!Report class methodsFor: 'as yet unclassified' stamp: 'bq 6/12/2022 19:08:53'!
+from: anAccount 
+	^self new initializeFor: anAccount! !
+
+
+!classDefinition: #AccountSummary category: 'ServiciosFinancieros-Solucion'!
+Report subclass: #AccountSummary
+	instanceVariableNames: 'reports'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!AccountSummary methodsFor: 'private' stamp: 'rgrg 6/12/2022 18:58:26'!
+messageForBalance: balanceValue
+	^'Balance = ', balanceValue asString! !
+
+
+!AccountSummary methodsFor: 'initialization' stamp: 'bq 6/12/2022 19:42:10'!
 initializeFor: anAccount
 	| transactions |
 	transactions := anAccount transactions .
 	reports := OrderedCollection new .
 	transactions do: [ :aTransaction |
-		reports add: (aTransaction messageForReport: self)
+		reports add: (aTransaction behaviourForReport: self)
 		] .
 	reports add: (self messageForBalance: anAccount balance )! !
 
-!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:58:26'!
-messageForBalance: balanceValue
-	^'Balance = ', balanceValue asString! !
 
-!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:46:00'!
-messageForDeposit: depositValue
+!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:29'!
+procedureForDeposit: depositValue
 	^'Deposito por ', depositValue asString! !
 
-!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:46:47'!
-messageForTransferDepositLeg: depositValue
+!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:40'!
+procedureForTransferDepositLeg: depositValue
 	^'Entrada por transferencia de ', depositValue asString! !
 
-!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:47:04'!
-messageForTransferWithdrawLeg: withdrawValue
+!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:49'!
+procedureForTransferWithdrawLeg: withdrawValue
 	^'Salida por transferencia de ', withdrawValue asString! !
 
-!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:46:21'!
-messageForWithdraw: withdrawValue
+!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:57'!
+procedureForWithdraw: withdrawValue
 	^'Extraccion por ', withdrawValue asString! !
 
-!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:34:16'!
+
+!AccountSummary methodsFor: 'accessing' stamp: 'rgrg 6/12/2022 18:36:31'!
+includes: aReportMessage
+	^reports includes: aReportMessage ! !
+
+!AccountSummary methodsFor: 'accessing' stamp: 'rgrg 6/12/2022 18:34:16'!
 size
 	^reports size! !
 
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion'!
+Report subclass: #TransferNet
+	instanceVariableNames: 'net'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
 
-!classDefinition: 'SummaryReport class' category: 'ServiciosFinancieros-Solucion'!
-SummaryReport class
-	instanceVariableNames: ''!
+!TransferNet methodsFor: 'accessing' stamp: 'bq 6/12/2022 19:18:18'!
+isTransferNet: anAmmountOfPesos
+	^anAmmountOfPesos = net .! !
 
-!SummaryReport class methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:53:32'!
-from: anAccount 
-	^self new initializeFor: anAccount! !
+
+!TransferNet methodsFor: 'initialization' stamp: 'bq 6/12/2022 19:42:10'!
+initializeFor: anAccount
+	| transactions  |
+	transactions := anAccount transactions .
+
+	
+		net := transactions sum:
+		 [ :transaction | transaction behaviourForReport: self ] ifEmpty: [0*peso].
+		
+	! !
+
+
+!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:30'!
+procedureForDeposit: depositValue
+	^0*peso.! !
+
+!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:41'!
+procedureForTransferDepositLeg: depositValue
+	^depositValue.! !
+
+!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:49'!
+procedureForTransferWithdrawLeg: depositValue
+	^depositValue negated.! !
+
+!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:57'!
+procedureForWithdraw: depositValue
+	^0*peso! !
 
 
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Solucion'!
