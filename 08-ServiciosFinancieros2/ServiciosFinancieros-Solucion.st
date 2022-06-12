@@ -309,44 +309,68 @@ TestCase subclass: #ReportTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'rgrg 6/9/2022 21:28:55'!
+
+!classDefinition: #SummaryReportTest category: 'ServiciosFinancieros-Solucion'!
+ReportTest subclass: #SummaryReportTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!SummaryReportTest methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:58:37'!
 test01
 
-	| account |
+	| account report |
 	
 	account := ReceptiveAccount new .
+	report := SummaryReport from: account .
 	
-	self assert: 0 equals: account summaryReport size .
+	self assert: 1 equals: report size .
 ! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'rgrg 6/9/2022 21:30:54'!
+!SummaryReportTest methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:58:44'!
 test02
 
-	| account |
+	| account report |
 	
 	account := ReceptiveAccount new .
 	Deposit register: 50*peso on: account.
+	report := SummaryReport from: account .
 	
-	self assert: 1 equals: account summaryReport size .
+	self assert: 2 equals: report size .
 ! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'rgrg 6/9/2022 21:45:57'!
+!SummaryReportTest methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 19:00:10'!
 test03
 
-	| account account2|
+	| account account2 report1 report2 |
 	
 	account := ReceptiveAccount new .
 	account2 := ReceptiveAccount new .
 	Deposit register: 50*peso on: account.
 	Withdraw register: 50*peso on: account.
-	
 	Transfer amount: 50*peso from: account2 to: account.
+	report1 := SummaryReport from: account .
+	report2 := SummaryReport from: account2 .
 	
+	self assert: report1 includes: 'Deposito por 50 * pesos'.
+	self assert: report1 includes: 'Extraccion por 50 * pesos'.
+	self assert: report1 includes: 'Entrada por transferencia de 50 * pesos'.
+	self deny: (report1 includes: 'Salida por transferencia de 50 * pesos').
+	self assert: report2 includes: 'Salida por transferencia de 50 * pesos'.
+! !
+
+!SummaryReportTest methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:52:11'!
+test04
+
+	| account report |
 	
-	self assert: account summaryReport includes: 'Deposito por 50 pesos'.
-	self assert: account summaryReport includes: 'Extraccion por 50 pesos'.
-	self assert: account summaryReport includes: 'Entrada por transferencia de 50 pesos'.
-	self assert: account2 summaryReport includes: 'Salida por transferencia de 50 pesos'.
+	account := ReceptiveAccount new .
+	Deposit register: 50*peso on: account.
+	Withdraw register: 40*peso on: account .
+	report := SummaryReport from: account .
+	
+	self assert: report includes: 'Balance = 10 * pesos'
 ! !
 
 
@@ -508,10 +532,10 @@ initialize
 	parents := OrderedCollection new.! !
 
 
-!Portfolio methodsFor: 'main protocol' stamp: 'HAW 5/25/2019 11:19:36'!
+!Portfolio methodsFor: 'main protocol' stamp: 'rgrg 6/12/2022 18:57:32'!
 balance
 	
-	^accounts sum: [ :anAccount | anAccount balance ] ifEmpty: [ 0 ]! !
+	^accounts sum: [ :anAccount | anAccount balance ] ifEmpty: [ 0*peso ]! !
 
 !Portfolio methodsFor: 'main protocol' stamp: 'HAW 5/25/2019 11:28:29'!
 hasRegistered: aTransaction
@@ -644,11 +668,11 @@ initialize
 	transactions := OrderedCollection new.! !
 
 
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'HAW 5/25/2019 11:24:46'!
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'rgrg 6/12/2022 18:57:25'!
 balance
 
 	^transactions 
-		inject: 0
+		inject: 0*peso
 		into: [ :currentBalance :transaction | transaction affectBalance: currentBalance ]! !
 
 !ReceptiveAccount methodsFor: 'main protocol' stamp: 'NR 10/21/2019 18:55:56'!
@@ -746,9 +770,9 @@ affectBalance: aBalance
 	^aBalance + value ! !
 
 
-!Deposit methodsFor: 'as yet unclassified' stamp: 'rgrg 6/9/2022 21:46:57'!
-messageForReport
-	^('Deposito por ' , (value amount asString) , ' pesos')! !
+!Deposit methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:45:25'!
+messageForReport: aReport 
+	^aReport messageForDeposit: self value! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -786,7 +810,7 @@ value
 	^transfer value! !
 
 
-!TransferLeg methodsFor: 'initialization' stamp: 'LL 9/20/2020 22:28:14'!
+!TransferLeg methodsFor: 'initialization' stamp: 'rgrg 6/12/2022 18:53:11'!
 initializeWith: aTransfer
 
 	transfer := aTransfer! !
@@ -797,7 +821,7 @@ initializeWith: aTransfer
 TransferLeg class
 	instanceVariableNames: ''!
 
-!TransferLeg class methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 22:45:01'!
+!TransferLeg class methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:53:11'!
 of: aTransfer on: anAccount
 
 	| transaction |
@@ -815,9 +839,9 @@ TransferLeg subclass: #TransferDepositLeg
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!TransferDepositLeg methodsFor: 'accessing' stamp: 'rgrg 6/9/2022 21:48:00'!
-messageForReport
-	^('Entrada por transferencia de ' , (self value amount asString) , ' pesos')! !
+!TransferDepositLeg methodsFor: 'accessing' stamp: 'rgrg 6/12/2022 18:44:30'!
+messageForReport: aReport 
+	^aReport messageForTransferDepositLeg: self value! !
 
 !TransferDepositLeg methodsFor: 'accessing' stamp: 'LL 9/20/2020 22:26:10'!
 withdrawLeg
@@ -843,15 +867,15 @@ depositLeg
 
 	^transfer depositLeg! !
 
+!TransferWithdrawLeg methodsFor: 'accessing' stamp: 'rgrg 6/12/2022 18:44:52'!
+messageForReport: aReport 
+	^aReport messageForTransferWithdrawLeg: self value! !
+
 
 !TransferWithdrawLeg methodsFor: 'balance' stamp: 'LL 9/20/2020 22:27:55'!
 affectBalance: aBalance
 
 	^aBalance - self value! !
-
-!TransferWithdrawLeg methodsFor: 'balance' stamp: 'rgrg 6/9/2022 21:48:48'!
-messageForReport
-	^('Salida por transferencia de ' , (self value amount asString) , ' pesos')! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Solucion'!
@@ -867,9 +891,9 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Withdraw methodsFor: 'value' stamp: 'rgrg 6/9/2022 21:48:21'!
-messageForReport
-	^('Extraccion por ' , (value amount asString) , ' pesos')! !
+!Withdraw methodsFor: 'value' stamp: 'rgrg 6/12/2022 18:45:10'!
+messageForReport: aReport 
+	^aReport messageForWithdraw: self value! !
 
 !Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:33'!
 value
@@ -903,6 +927,70 @@ register: aValue on: account
 	account register: transaction.
 		
 	^ transaction! !
+
+
+!classDefinition: #Report category: 'ServiciosFinancieros-Solucion'!
+Object subclass: #Report
+	instanceVariableNames: 'reports'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+
+!classDefinition: #SummaryReport category: 'ServiciosFinancieros-Solucion'!
+Report subclass: #SummaryReport
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:36:31'!
+includes: aReportMessage
+	^reports includes: aReportMessage ! !
+
+!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:55:01'!
+initializeFor: anAccount
+	| transactions |
+	transactions := anAccount transactions .
+	reports := OrderedCollection new .
+	transactions do: [ :aTransaction |
+		reports add: (aTransaction messageForReport: self)
+		] .
+	reports add: (self messageForBalance: anAccount balance )! !
+
+!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:58:26'!
+messageForBalance: balanceValue
+	^'Balance = ', balanceValue asString! !
+
+!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:46:00'!
+messageForDeposit: depositValue
+	^'Deposito por ', depositValue asString! !
+
+!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:46:47'!
+messageForTransferDepositLeg: depositValue
+	^'Entrada por transferencia de ', depositValue asString! !
+
+!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:47:04'!
+messageForTransferWithdrawLeg: withdrawValue
+	^'Salida por transferencia de ', withdrawValue asString! !
+
+!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:46:21'!
+messageForWithdraw: withdrawValue
+	^'Extraccion por ', withdrawValue asString! !
+
+!SummaryReport methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:34:16'!
+size
+	^reports size! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SummaryReport class' category: 'ServiciosFinancieros-Solucion'!
+SummaryReport class
+	instanceVariableNames: ''!
+
+!SummaryReport class methodsFor: 'as yet unclassified' stamp: 'rgrg 6/12/2022 18:53:32'!
+from: anAccount 
+	^self new initializeFor: anAccount! !
 
 
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Solucion'!
