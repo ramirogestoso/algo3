@@ -381,6 +381,73 @@ test04ReportIncludesBalance
 	self assert: report includes: 'Balance = 10 * pesos'
 ! !
 
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:07:00'!
+test05ReportForPortfolioIncludesHisChildrenTransactions
+
+	| account account2 portfolio report |
+	
+	account := ReceptiveAccount new .
+	account2 := ReceptiveAccount new .
+	portfolio := Portfolio new .
+	
+	portfolio add: account .
+	portfolio add: account2 .
+	Deposit register: 50*peso on: account.
+	Withdraw register: 40*peso on: account2 .
+	report := AccountSummary from: portfolio .
+	
+	self assert: report includes: 'Deposito por 50 * pesos'.
+	self assert: report includes: 'Extraccion por 40 * pesos'.
+! !
+
+
+!classDefinition: #PortfolioTreePrinterTest category: 'ServiciosFinancieros-Solucion'!
+ReportTest subclass: #PortfolioTreePrinterTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:16:29'!
+test01
+	| johnsAccount report |
+	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan' .
+	
+	report := PortfolioTreePrinter from: johnsAccount .
+	
+	self assert: report includes: 'Cuenta de Juan' .
+	! !
+
+!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:26:23'!
+test02
+	| johnsAccount report portfolio |
+	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan' .
+	portfolio := Portfolio named: 'Portafolio familiar' with: johnsAccount .
+	
+	report := PortfolioTreePrinter from: portfolio .
+	
+	self assert: report includes: 'Cuenta de Juan' .
+	self assert: report includes: 'Portafolio familiar' .
+	! !
+
+!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:58:54'!
+test03
+	| johnsAccount report angiesAccount childrenPortfolio familyPortfolio myAccount |
+	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan'. 
+	angiesAccount := ReceptiveAccount named: 'Cuenta de Angeles'. 
+	childrenPortfolio := Portfolio named: 'Portfolio de hijos' with: johnsAccount with: angiesAccount. 
+	myAccount := ReceptiveAccount named: 'Cuenta mia'. 
+	familyPortfolio := Portfolio named: 'Portfolio de la familia' with: myAccount with: childrenPortfolio.
+	
+	report := PortfolioTreePrinter from: familyPortfolio .
+	
+	self assert: report includes: 'Portfolio de la familia' .
+	self assert: report includes: '  Cuenta mia' .
+	self assert: report includes: '  Portfolio de hijos' .
+	self assert: report includes: '    Cuenta de Juan' .
+	self assert: report includes: '    Cuenta de Angeles' .
+	! !
+
 
 !classDefinition: #TransferNetTest category: 'ServiciosFinancieros-Solucion'!
 ReportTest subclass: #TransferNetTest
@@ -440,6 +507,28 @@ test03ReportTransferNetDoesntConsiderTransactionsThatAreNotTransferences
 	report := TransferNet from: account .
 	
 	self assert: (report isTransferNet: 20*peso).
+! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:10:49'!
+test04ReportTransferNetConsidersAllPortfolioChildren
+
+
+
+	| account account2 report portfolio|
+	
+	account := ReceptiveAccount new .
+	account2 := ReceptiveAccount new .
+	
+	Transfer amount: 10*peso from: account to: account2.
+	Transfer amount: 30*peso from: account2 to: account.
+	portfolio := Portfolio new.
+	portfolio add: account.
+	portfolio add: account2.
+
+	report := TransferNet from: portfolio.
+	
+	self assert: (report isTransferNet: 0*peso).
+
 ! !
 
 
@@ -549,10 +638,15 @@ test06CannotTransferAZeroAmount
 
 !classDefinition: #Account category: 'ServiciosFinancieros-Solucion'!
 Object subclass: #Account
-	instanceVariableNames: ''
+	instanceVariableNames: 'name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
+
+!Account methodsFor: 'initialization' stamp: 'rg 6/13/2022 20:17:51'!
+initializeNamed: anAccountName 
+	name := anAccountName ! !
+
 
 !Account methodsFor: 'main protocol' stamp: 'HAW 5/25/2019 12:23:40'!
 balance
@@ -563,6 +657,10 @@ balance
 hasRegistered: aTransaction
 
 	self subclassResponsibility ! !
+
+!Account methodsFor: 'main protocol' stamp: 'rg 6/13/2022 20:21:05'!
+name
+	^name! !
 
 !Account methodsFor: 'main protocol' stamp: 'HAW 5/25/2019 12:23:15'!
 transactions
@@ -585,6 +683,21 @@ isComposedBy: anAccount
 addTransactionsTo: aCollectionOfTransactions
 
 	self subclassResponsibility ! !
+
+
+!Account methodsFor: 'report' stamp: 'rg 6/13/2022 20:50:42'!
+addToReport: aReport
+	self subclassResponsibility ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Account class' category: 'ServiciosFinancieros-Solucion'!
+Account class
+	instanceVariableNames: ''!
+
+!Account class methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:17:25'!
+named: anAccountName
+	^self new initializeNamed: anAccountName ! !
 
 
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Solucion'!
@@ -696,6 +809,16 @@ signalCanNotAddAccount
 	
 	self error: self class canNotAddAccountErrorMessage! !
 
+
+!Portfolio methodsFor: 'report' stamp: 'rg 6/13/2022 20:54:13'!
+addChildrenToReport: aReport 
+	accounts do: [ :anAccount | anAccount addToReport: aReport ]! !
+
+!Portfolio methodsFor: 'report' stamp: 'rg 6/13/2022 20:52:25'!
+addToReport: aReport
+	aReport addPortfolio: self
+	! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: 'ServiciosFinancieros-Solucion'!
@@ -706,6 +829,26 @@ Portfolio class
 canNotAddAccountErrorMessage
 	
 	^'Can not add repeated account to a portfolio'! !
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:25:55'!
+named: aName  with: anAccount
+
+	^self new initializeNamed: aName ;
+		add: anAccount;
+		
+		
+		
+		yourself! !
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:25:02'!
+named: aName with: anAccount with: anotherAccount
+
+	^self new initializeNamed: aName ;
+		add: anAccount;
+		add: anotherAccount;
+		
+		
+		yourself! !
 
 !Portfolio class methodsFor: 'as yet unclassified' stamp: 'HAW 5/25/2019 11:18:21'!
 with: anAccount
@@ -778,6 +921,10 @@ isComposedBy: anAccount
 
 	^self = anAccount ! !
 
+
+!ReceptiveAccount methodsFor: 'report' stamp: 'rg 6/13/2022 20:51:42'!
+addToReport: aReport
+	aReport addReceptiveAccount: self .! !
 
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Solucion'!
@@ -1081,6 +1228,40 @@ includes: aReportMessage
 !AccountSummary methodsFor: 'accessing' stamp: 'rgrg 6/12/2022 18:34:16'!
 size
 	^reports size! !
+
+
+!classDefinition: #PortfolioTreePrinter category: 'ServiciosFinancieros-Solucion'!
+Report subclass: #PortfolioTreePrinter
+	instanceVariableNames: 'reports'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:49:48'!
+addPortfolio: aPortfolio
+	reports add: 	aPortfolio name .
+	aPortfolio addChildrenToReport: self .
+		
+	! !
+
+!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:47:46'!
+addReceptiveAccount: aReceptiveAccount
+	reports add: 	aReceptiveAccount name
+		
+	! !
+
+!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:40:31'!
+includes: anAccountName
+	^reports includes: anAccountName! !
+
+!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:47:16'!
+initializeFor: anAccount
+	reports := OrderedCollection new.
+	anAccount addToReport: self .
+	"reports add: anAccount name.
+	(anAccount isKindOf: Portfolio) ifTrue: [anAccount children do: [ :aChildren | reports add: aChildren name] .]."
+		
+	! !
 
 
 !classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion'!
