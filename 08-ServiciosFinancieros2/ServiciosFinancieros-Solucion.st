@@ -401,6 +401,125 @@ test05ReportForPortfolioIncludesHisChildrenTransactions
 ! !
 
 
+!classDefinition: #PortfolioDetailedTreePrinterTest category: 'ServiciosFinancieros-Solucion'!
+ReportTest subclass: #PortfolioDetailedTreePrinterTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!PortfolioDetailedTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'bq 6/15/2022 20:17:46'!
+test01ReportIncludesBalanceWithASpace
+
+
+	| johnsAccount report |
+	
+	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan' .
+	
+	
+
+	
+	report := PortfolioDetailedTreePrinter from: johnsAccount .
+	
+	self assert: report includes: 'Cuenta de Juan' .
+
+	self assert: report includes: ' Balance = 0 * pesos' .! !
+
+!PortfolioDetailedTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'bq 6/15/2022 20:20:36'!
+test02ReportIncludesATransactionWithASpace
+
+
+	| johnsAccount report |
+	
+	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan' .
+	
+	Deposit register: 50*peso on: johnsAccount .
+
+	report := PortfolioDetailedTreePrinter from: johnsAccount .
+	
+	self assert: report includes: 'Cuenta de Juan' .
+	
+	self assert: report includes: ' Deposito por 50 * pesos'.
+! !
+
+!PortfolioDetailedTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'bq 6/15/2022 20:18:22'!
+test03ReportIncludesPortfolio
+
+
+	| johnsPortfolio report |
+	
+	johnsPortfolio := Portfolio named: 'Portafolio de Juan' .
+	
+	
+
+	
+	report := PortfolioDetailedTreePrinter from: johnsPortfolio .
+	
+	self assert: report includes: 'Portafolio de Juan' .
+
+	! !
+
+!PortfolioDetailedTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'bq 6/15/2022 20:18:45'!
+test04ReportIncludesPortfolioBalanceWithASpace
+
+
+	| johnsPortfolio report |
+	
+	johnsPortfolio := Portfolio named: 'Portafolio de Juan' .
+	
+	
+
+	
+	report := PortfolioDetailedTreePrinter from: johnsPortfolio .
+	
+	self assert: report includes: 'Portafolio de Juan' .
+
+	self assert: report includes: ' Balance = 0 * pesos' .! !
+
+!PortfolioDetailedTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'bq 6/15/2022 20:20:20'!
+test05ReportCanHandleMultipleLevelsOfSpaces
+
+	| johnsAccount report angiesAccount childrenPortfolio familyPortfolio myAccount auxiliaryAccount |
+	
+	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan'. 
+	auxiliaryAccount := ReceptiveAccount new.
+	angiesAccount := ReceptiveAccount named: 'Cuenta de Angeles'. 
+	childrenPortfolio := Portfolio named: 'Portfolio de hijos' with: johnsAccount with: angiesAccount. 
+	myAccount := ReceptiveAccount named: 'Cuenta mia'. 
+	familyPortfolio := Portfolio named: 'Portfolio de la familia' with: myAccount with: childrenPortfolio.
+	
+	Deposit register: 50*peso on: myAccount .
+	Withdraw register: 150*peso on: myAccount .
+	
+	Deposit register: 550*peso on: johnsAccount .
+	Withdraw register: 1150*peso on: johnsAccount .
+	
+	Transfer amount: 1200*peso from: angiesAccount to: auxiliaryAccount .
+	
+	
+	
+	report := PortfolioDetailedTreePrinter from: familyPortfolio .
+	
+	self assert: report includes: 'Portfolio de la familia'.
+	self assert: report includes: ' Cuenta mia'.
+	self assert: report includes: '  Deposito por 50 * pesos'.
+	self assert: report includes: '  Extraccion por 150 * pesos'.
+	self assert: report includes: '  Balance = -100 * pesos'.
+	self assert: report includes: ' Portfolio de hijos'.
+	self assert: report includes: '  Cuenta de Juan'.
+	self assert: report includes: '   Deposito por 550 * pesos'.
+	self assert: report includes: '   Extraccion por 1150 * pesos'.
+	self assert: report includes: '   Balance = -600 * pesos'.
+	self assert: report includes: '  Cuenta de Angeles'.
+	self assert: report includes: '   Salida por transferencia de 1200 * pesos'.
+	self assert: report includes: '   Balance = -1200 * pesos'.
+	self assert: report includes: '  Balance = -1800 * pesos'.
+	self assert: report includes: ' Balance = -1900 * pesos' .
+
+
+! !
+
+
 !classDefinition: #PortfolioTreePrinterTest category: 'ServiciosFinancieros-Solucion'!
 ReportTest subclass: #PortfolioTreePrinterTest
 	instanceVariableNames: ''
@@ -408,8 +527,8 @@ ReportTest subclass: #PortfolioTreePrinterTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:16:29'!
-test01
+!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'bq 6/15/2022 20:15:28'!
+test01ReportIncludesAccountsName
 	| johnsAccount report |
 	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan' .
 	
@@ -418,20 +537,20 @@ test01
 	self assert: report includes: 'Cuenta de Juan' .
 	! !
 
-!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:26:23'!
-test02
+!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'bq 6/15/2022 20:16:09'!
+test02SpacesAreBeignUsedProperlyWithAChildrenAccount
 	| johnsAccount report portfolio |
 	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan' .
 	portfolio := Portfolio named: 'Portafolio familiar' with: johnsAccount .
 	
 	report := PortfolioTreePrinter from: portfolio .
 	
-	self assert: report includes: 'Cuenta de Juan' .
+	self assert: report includes: ' Cuenta de Juan' .
 	self assert: report includes: 'Portafolio familiar' .
 	! !
 
-!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:58:54'!
-test03
+!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'bq 6/15/2022 20:17:00'!
+test03ReportUsesSpacesForGranchildAccountsAndChildrenPortfolio
 	| johnsAccount report angiesAccount childrenPortfolio familyPortfolio myAccount |
 	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan'. 
 	angiesAccount := ReceptiveAccount named: 'Cuenta de Angeles'. 
@@ -442,10 +561,29 @@ test03
 	report := PortfolioTreePrinter from: familyPortfolio .
 	
 	self assert: report includes: 'Portfolio de la familia' .
-	self assert: report includes: '  Cuenta mia' .
-	self assert: report includes: '  Portfolio de hijos' .
-	self assert: report includes: '    Cuenta de Juan' .
-	self assert: report includes: '    Cuenta de Angeles' .
+	self assert: report includes: ' Cuenta mia' .
+	self assert: report includes: ' Portfolio de hijos' .
+	self assert: report includes: '  Cuenta de Juan' .
+	self assert: report includes: '  Cuenta de Angeles' .
+	! !
+
+!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'bq 6/15/2022 20:17:28'!
+test04ReportMantainsHierarchyOrder
+	| johnsAccount report childrenPortfolio familyPortfolio myAccount |
+	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan'. 
+	
+	childrenPortfolio := Portfolio named: 'Portfolio de hijos' with: johnsAccount.
+	myAccount := ReceptiveAccount named: 'Cuenta mia'. 
+	familyPortfolio := Portfolio named: 'Portfolio de la familia' with: myAccount with: childrenPortfolio.
+	
+	report := PortfolioTreePrinter from: familyPortfolio .
+	
+	self assert: (report at: 1) equals: 'Portfolio de la familia' .
+	self assert: (report at: 2) equals: ' Cuenta mia' .
+	self assert: (report at: 3) equals: ' Portfolio de hijos' .
+	self assert: (report at: 4) equals: '  Cuenta de Juan' .
+	
+	
 	! !
 
 
@@ -643,11 +781,6 @@ Object subclass: #Account
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!Account methodsFor: 'initialization' stamp: 'rg 6/13/2022 20:17:51'!
-initializeNamed: anAccountName 
-	name := anAccountName ! !
-
-
 !Account methodsFor: 'main protocol' stamp: 'HAW 5/25/2019 12:23:40'!
 balance
 
@@ -685,9 +818,19 @@ addTransactionsTo: aCollectionOfTransactions
 	self subclassResponsibility ! !
 
 
+!Account methodsFor: 'initialization' stamp: 'rg 6/13/2022 20:17:51'!
+initializeNamed: anAccountName 
+	name := anAccountName ! !
+
+
 !Account methodsFor: 'report' stamp: 'rg 6/13/2022 20:50:42'!
 addToReport: aReport
 	self subclassResponsibility ! !
+
+!Account methodsFor: 'report' stamp: 'bq 6/15/2022 19:24:23'!
+distanceToRootParent
+
+	^self subclassResponsibility .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -819,6 +962,12 @@ addToReport: aReport
 	aReport addPortfolio: self
 	! !
 
+!Portfolio methodsFor: 'report' stamp: 'bq 6/15/2022 19:27:59'!
+distanceToRootParent
+
+	(parents isEmpty) ifFalse: [^1 + parents first distanceToRootParent ].
+	^0! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: 'ServiciosFinancieros-Solucion'!
@@ -868,16 +1017,18 @@ with: anAccount with: anotherAccount
 
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Solucion'!
 Account subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions'
+	instanceVariableNames: 'transactions parents'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!ReceptiveAccount methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:35'!
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'bq 6/15/2022 19:15:00'!
 initialize
 
 	super initialize.
-	transactions := OrderedCollection new.! !
+	transactions := OrderedCollection new.
+	
+	parents := OrderedCollection new.! !
 
 
 !ReceptiveAccount methodsFor: 'main protocol' stamp: 'rgrg 6/12/2022 18:57:25'!
@@ -911,9 +1062,17 @@ addTransactionsTo: aCollectionOfTransactions
 	aCollectionOfTransactions addAll: transactions ! !
 
 
-!ReceptiveAccount methodsFor: 'composition' stamp: 'HAW 5/25/2019 12:03:32'!
+!ReceptiveAccount methodsFor: 'composition' stamp: 'bq 6/15/2022 19:16:14'!
+addRootParentsTo: rootParents
+
+	parents 
+		ifEmpty: [ rootParents add: self ] 
+		ifNotEmpty: [ parents do: [ :aParent | aParent addRootParentsTo: rootParents ]]! !
+
+!ReceptiveAccount methodsFor: 'composition' stamp: 'bq 6/15/2022 19:14:44'!
 addedTo: aPortfolio 
-	
+
+	parents add: aPortfolio .
 	! !
 
 !ReceptiveAccount methodsFor: 'composition' stamp: 'HAW 5/25/2019 11:54:51'!
@@ -921,10 +1080,28 @@ isComposedBy: anAccount
 
 	^self = anAccount ! !
 
+!ReceptiveAccount methodsFor: 'composition' stamp: 'bq 6/15/2022 19:15:24'!
+rootParents
+	
+	| rootParents |
+	
+	rootParents := Set new.
+	self addRootParentsTo: rootParents.
+	
+	^ rootParents! !
+
 
 !ReceptiveAccount methodsFor: 'report' stamp: 'rg 6/13/2022 20:51:42'!
 addToReport: aReport
 	aReport addReceptiveAccount: self .! !
+
+!ReceptiveAccount methodsFor: 'report' stamp: 'bq 6/15/2022 19:28:15'!
+distanceToRootParent
+	
+
+
+	(parents isEmpty) ifFalse: [^1 + parents first distanceToRootParent ].
+	^0! !
 
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Solucion'!
@@ -980,9 +1157,9 @@ affectBalance: aBalance
 	^aBalance + value ! !
 
 
-!Deposit methodsFor: 'report' stamp: 'bq 6/12/2022 19:46:30'!
+!Deposit methodsFor: 'report' stamp: 'bq 6/15/2022 20:22:40'!
 behaviourForReport: aReport 
-	^aReport procedureForDeposit: self value! !
+	^aReport procedureForDeposit: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1061,9 +1238,9 @@ affectBalance: aBalance
 	^aBalance + self value! !
 
 
-!TransferDepositLeg methodsFor: 'report' stamp: 'bq 6/12/2022 19:46:41'!
+!TransferDepositLeg methodsFor: 'report' stamp: 'bq 6/15/2022 20:22:45'!
 behaviourForReport: aReport 
-	^aReport procedureForTransferDepositLeg: self value! !
+	^aReport procedureForTransferDepositLeg: self! !
 
 
 !classDefinition: #TransferWithdrawLeg category: 'ServiciosFinancieros-Solucion'!
@@ -1085,9 +1262,9 @@ affectBalance: aBalance
 	^aBalance - self value! !
 
 
-!TransferWithdrawLeg methodsFor: 'report' stamp: 'bq 6/12/2022 19:46:49'!
+!TransferWithdrawLeg methodsFor: 'report' stamp: 'bq 6/15/2022 20:22:50'!
 behaviourForReport: aReport 
-	^aReport procedureForTransferWithdrawLeg: self value! !
+	^aReport procedureForTransferWithdrawLeg: self! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Solucion'!
@@ -1115,9 +1292,9 @@ affectBalance: aBalance
 	^aBalance - value! !
 
 
-!Withdraw methodsFor: 'report' stamp: 'bq 6/12/2022 19:46:57'!
+!Withdraw methodsFor: 'report' stamp: 'bq 6/15/2022 20:22:54'!
 behaviourForReport: aReport 
-	^aReport procedureForWithdraw: self value! !
+	^aReport procedureForWithdraw: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1149,21 +1326,13 @@ Object subclass: #Report
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!Report methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:29'!
-procedureForDeposit: depositValue
-	self subclassResponsibility .! !
-
-!Report methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:40'!
-procedureForTransferDepositLeg: depositValue
-	self subclassResponsibility .! !
-
-!Report methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:48'!
-procedureForTransferWithdrawLeg: depositValue
-	self subclassResponsibility .! !
-
-!Report methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:57'!
-procedureForWithdraw: depositValue
-	self subclassResponsibility .! !
+!Report methodsFor: 'private' stamp: 'bq 6/15/2022 20:28:50'!
+calculateSpaces: anAccount
+	| tamaño espacios |
+	tamaño := anAccount distanceToRootParent.
+	espacios := ''.
+	tamaño timesRepeat: [espacios := espacios , ' '].
+	^espacios! !
 
 
 !Report methodsFor: 'initialization' stamp: 'bq 6/12/2022 19:36:19'!
@@ -1204,21 +1373,31 @@ initializeFor: anAccount
 	reports add: (self messageForBalance: anAccount balance )! !
 
 
-!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:29'!
-procedureForDeposit: depositValue
-	^'Deposito por ', depositValue asString! !
+!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/15/2022 20:25:55'!
+procedureForDeposit: aDeposit
+	^'Deposito por ', aDeposit value asString! !
 
-!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:40'!
-procedureForTransferDepositLeg: depositValue
-	^'Entrada por transferencia de ', depositValue asString! !
+!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/15/2022 20:25:48'!
+procedureForTransferDepositLeg: aDepositTransferLeg
+	^'Entrada por transferencia de ', aDepositTransferLeg value asString! !
 
-!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:49'!
-procedureForTransferWithdrawLeg: withdrawValue
-	^'Salida por transferencia de ', withdrawValue asString! !
+!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/15/2022 20:25:35'!
+procedureForTransferWithdrawLeg: aWithdrawTransferLeg
+	^'Salida por transferencia de ', aWithdrawTransferLeg value asString! !
 
-!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:57'!
-procedureForWithdraw: withdrawValue
-	^'Extraccion por ', withdrawValue asString! !
+!AccountSummary methodsFor: 'procedures for transactions' stamp: 'bq 6/15/2022 20:25:12'!
+procedureForWithdraw: aWithdraw
+	^'Extraccion por ', aWithdraw value asString! !
+
+
+!AccountSummary methodsFor: 'detailed tree printer' stamp: 'bq 6/15/2022 19:52:24'!
+beAddedTo: aReportList
+	aReportList addAll: reports.! !
+
+!AccountSummary methodsFor: 'detailed tree printer' stamp: 'bq 6/15/2022 19:54:50'!
+reportsCollect: aBlock
+	reports := reports collect: aBlock
+! !
 
 
 !AccountSummary methodsFor: 'accessing' stamp: 'rgrg 6/12/2022 18:36:31'!
@@ -1230,6 +1409,55 @@ size
 	^reports size! !
 
 
+!classDefinition: #PortfolioDetailedTreePrinter category: 'ServiciosFinancieros-Solucion'!
+Report subclass: #PortfolioDetailedTreePrinter
+	instanceVariableNames: 'reports'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!PortfolioDetailedTreePrinter methodsFor: 'procedures for accounts' stamp: 'bq 6/15/2022 20:29:24'!
+addPortfolio: aPortfolio
+
+	| espacios |
+	espacios := self calculateSpaces: aPortfolio .
+
+	reports add: espacios , aPortfolio name.
+	
+	aPortfolio addChildrenToReport: self .
+	
+	
+	
+	
+	reports add: espacios, ' Balance = ', aPortfolio balance asString.! !
+
+!PortfolioDetailedTreePrinter methodsFor: 'procedures for accounts' stamp: 'bq 6/15/2022 20:29:29'!
+addReceptiveAccount: aReceptiveAccount
+	| espacios resumenDeCuenta |
+	espacios := self calculateSpaces: aReceptiveAccount .
+	reports add: 	espacios , aReceptiveAccount name.
+	
+	resumenDeCuenta := AccountSummary from: aReceptiveAccount .
+
+	espacios := espacios ,' '.
+	
+	resumenDeCuenta reportsCollect: [:aReport | espacios , aReport ].
+	
+	resumenDeCuenta beAddedTo: reports.
+	! !
+
+
+!PortfolioDetailedTreePrinter methodsFor: 'initialization' stamp: 'bq 6/15/2022 19:40:40'!
+initializeFor: anAccount
+	reports := OrderedCollection new.
+	anAccount addToReport: self .! !
+
+
+!PortfolioDetailedTreePrinter methodsFor: 'accessing' stamp: 'bq 6/15/2022 19:53:24'!
+includes: anAccountName
+	^reports includes: anAccountName! !
+
+
 !classDefinition: #PortfolioTreePrinter category: 'ServiciosFinancieros-Solucion'!
 Report subclass: #PortfolioTreePrinter
 	instanceVariableNames: 'reports'
@@ -1237,24 +1465,19 @@ Report subclass: #PortfolioTreePrinter
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:49:48'!
+!PortfolioTreePrinter methodsFor: 'procedures for accounts' stamp: 'bq 6/15/2022 19:35:27'!
 addPortfolio: aPortfolio
-	reports add: 	aPortfolio name .
+	reports add: (	self calculateSpaces: aPortfolio) , aPortfolio name.
+	
 	aPortfolio addChildrenToReport: self .
-		
 	! !
 
-!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:47:46'!
+!PortfolioTreePrinter methodsFor: 'procedures for accounts' stamp: 'bq 6/15/2022 19:35:27'!
 addReceptiveAccount: aReceptiveAccount
-	reports add: 	aReceptiveAccount name
-		
-	! !
+	reports add: 	(self calculateSpaces: aReceptiveAccount) , aReceptiveAccount name.! !
 
-!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:40:31'!
-includes: anAccountName
-	^reports includes: anAccountName! !
 
-!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'rg 6/13/2022 20:47:16'!
+!PortfolioTreePrinter methodsFor: 'initialization' stamp: 'rg 6/13/2022 20:47:16'!
 initializeFor: anAccount
 	reports := OrderedCollection new.
 	anAccount addToReport: self .
@@ -1262,6 +1485,17 @@ initializeFor: anAccount
 	(anAccount isKindOf: Portfolio) ifTrue: [anAccount children do: [ :aChildren | reports add: aChildren name] .]."
 		
 	! !
+
+
+
+
+!PortfolioTreePrinter methodsFor: 'accessing' stamp: 'bq 6/15/2022 19:32:55'!
+at: aNumber
+	^reports at: aNumber .! !
+
+!PortfolioTreePrinter methodsFor: 'accessing' stamp: 'rg 6/13/2022 20:40:31'!
+includes: anAccountName
+	^reports includes: anAccountName! !
 
 
 !classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion'!
@@ -1288,20 +1522,20 @@ initializeFor: anAccount
 	! !
 
 
-!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:30'!
-procedureForDeposit: depositValue
+!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/15/2022 20:24:48'!
+procedureForDeposit: aDeposit
 	^0*peso.! !
 
-!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:41'!
-procedureForTransferDepositLeg: depositValue
-	^depositValue.! !
+!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/15/2022 20:24:39'!
+procedureForTransferDepositLeg: aDepositTransferLeg
+	^aDepositTransferLeg value.! !
 
-!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:49'!
-procedureForTransferWithdrawLeg: depositValue
-	^depositValue negated.! !
+!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/15/2022 20:24:15'!
+procedureForTransferWithdrawLeg: aWithdrawTransferLeg
+	^aWithdrawTransferLeg value negated.! !
 
-!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/12/2022 19:46:57'!
-procedureForWithdraw: depositValue
+!TransferNet methodsFor: 'procedures for transactions' stamp: 'bq 6/15/2022 20:24:51'!
+procedureForWithdraw: aWithdraw
 	^0*peso! !
 
 
